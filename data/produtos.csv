@@ -1,0 +1,76 @@
+nome,categoria,preco,descricao,imagemUrl,ativo
+Água Destilada 1L,ADITIVOS,,,,True
+Substituto de Chumbo,ADITIVOS,,,,True
+Tapa Fugas (Radiador),ADITIVOS,,,,True
+Tratamento Diesel,ADITIVOS,,,,True
+Tratamento Gasolina,ADITIVOS,,,,True
+Anticongelante 30% 5L,ADITIVOS,,,,True
+Anticongelante Puro 5L,ADITIVOS,,,,True
+AdBlue 10L,ADITIVOS,,,,True
+Limpa Jantes,LAVAGEM,,,,True
+Limpa Para-Brisas (fluido),LAVAGEM,,,,True
+Limpa Vidros,LAVAGEM,,,,True
+Massa Polir,LAVAGEM,,,,True
+Limpa Tablier,LAVAGEM,,,,True
+Limpa Para-Brisas 5L,LAVAGEM,,,,True
+Limpa Para-Brisas Inverno (20ºC) 5L,LAVAGEM,,,,True
+Óleo 15W40 1L,LUBRIFICANTES,,,,True
+Óleo 10W40 1L,LUBRIFICANTES,,,,True
+Óleo 10W40 5L,LUBRIFICANTES,,,,True
+Óleo 5W30 1L,LUBRIFICANTES,,,,True
+Óleo Direção (Transmissão),LUBRIFICANTES,,,,True
+Óleo Motosserra,LUBRIFICANTES,,,,True
+Óleo Competitivo Sintético 20W-50 1L,LUBRIFICANTES,,,,True
+Óleo 10W30 1L,LUBRIFICANTES,,,,True
+Óleo Hidráulico HM 46 20L,LUBRIFICANTES,,,,True
+Óleo Hidráulico HM 46 5L,LUBRIFICANTES,,,,True
+Massa Lubrificante 5kg,LUBRIFICANTES,,,,True
+Massa Lubrificante tubo,LUBRIFICANTES,,,,True
+Bidão Reserva 10L,ACESSORIOS,,,,True
+Bidão 5L,ACESSORIOS,,,,True
+Coletes Refletores,ACESSORIOS,,,,True
+Fita Adesiva,ACESSORIOS,,,,True
+Jogo de Fusiveís,ACESSORIOS,,,,True
+Kit Reparação (Emergência),ACESSORIOS,,,,True
+Luvas Latex (Par),ACESSORIOS,,,,True
+Tapetes Alcatifa,ACESSORIOS,,,,True
+Tapetes Borracha,ACESSORIOS,,,,True
+Triangulo de Sinalização,ACESSORIOS,,,,True
+Fusivel Lampada 12.5W,ACESSORIOS,,,,True
+Lâmpadas 12V 21W,ACESSORIOS,,,,True
+Lâmpadas 12V 21W laranja,ACESSORIOS,,,,True
+Lâmpadas 12.5W s/ casquilho,ACESSORIOS,,,,True
+Lâmpada Halógenea H1,ACESSORIOS,,,,True
+Lampada H4,ACESSORIOS,,,,True
+Lampadas 12V 10W Tubular,ACESSORIOS,,,,True
+Lampada H7,ACESSORIOS,,,,True
+Escovas Limpa Para-Brisas 330mm,ACESSORIOS,,,,True
+Escovas Limpa Para-Brisas 400mm,ACESSORIOS,,,,True
+Escovas Limpa Para-Brisas 430mm,ACESSORIOS,,,,True
+Escovas Limpa Para-Brisas 480mm,ACESSORIOS,,,,True
+Escovas Limpa Para-Brisas 510mm,ACESSORIOS,,,,True
+Escovas Limpa Para-Brisas 530mm,ACESSORIOS,,,,True
+Escovas Limpa Para-Brisas 550mm,ACESSORIOS,,,,True
+Escovas Limpa Para-Brisas 600mm,ACESSORIOS,,,,True
+Escovas Aerodinâmicas 450mm,ACESSORIOS,,,,True
+Escovas Aerodinâmicas 480mm,ACESSORIOS,,,,True
+Escovas Aerodinâmicas 510mm,ACESSORIOS,,,,True
+Escovas Aerodinâmicas 550mm,ACESSORIOS,,,,True
+Escovas Aerodinâmicas 575mm,ACESSORIOS,,,,True
+Escovas Aerodinâmicas 600mm,ACESSORIOS,,,,True
+Escovas Aerodinâmicas 650mm,ACESSORIOS,,,,True
+Pilhas CR2016,ACESSORIOS,,,,True
+Pilhas CR2025,ACESSORIOS,,,,True
+Pilhas CR1620,ACESSORIOS,,,,True
+Pilhas CR2032,ACESSORIOS,,,,True
+Pilhas 12V 23A (A23),ACESSORIOS,,,,True
+Pilhas 9V,ACESSORIOS,,,,True
+Pilhas AA,ACESSORIOS,,,,True
+Pilhas AAA,ACESSORIOS,,,,True
+Pilhas C,ACESSORIOS,,,,True
+Pilhas D,ACESSORIOS,,,,True
+Pilhas MN27 (12V),ACESSORIOS,,,,True
+Pilhas N,ACESSORIOS,,,,True
+Pilhas MN21 Duo 12V,ACESSORIOS,,,,True
+Ambientador Pinho,OUTROS,,,,True
+Panos Microfibra,OUTROS,,,,True

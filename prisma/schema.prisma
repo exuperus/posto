@@ -1,0 +1,81 @@
+// prisma/schema.prisma
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")  // pooled (Vercel)
+  directUrl = env("DIRECT_URL")    // ligação direta (migrations)
+}
+
+/* ---------- ENUMS ---------- */
+enum FuelType {
+  GASOLEO
+  GASOLEO_HI_ENERGY
+  GASOLINA_95
+  GASOLEO_AGRICOLA
+}
+
+enum Category {
+  LUBRIFICANTES
+  ADITIVOS
+  LAVAGEM
+  ACESSORIOS
+  OUTROS
+}
+
+/* ---------- MODELOS ---------- */
+
+model Station {
+  id                 Int      @id @default(autoincrement())
+  nome_comercial     String
+  morada             String
+  codigo_postal      String
+  localidade         String
+  lat                Float?
+  lng                Float?
+  telefone           String?
+  email              String?
+  horario_semana     String?
+  horario_fim_semana String?
+  feriados_especiais String?
+  servicosJson       String?   // JSON serializado
+  linksJson          String?
+  logoUrl            String?
+  heroUrl            String?
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+}
+
+model Fuel {
+  id              Int       @id @default(autoincrement())
+  tipo            FuelType
+  // Postgres: precisão fixa (10,3) — ex.: 1.603 €/L
+  preco_atual     Decimal   @db.Decimal(10, 3)
+  vigencia_inicio DateTime
+  preco_anterior  Decimal?  @db.Decimal(10, 3)
+  publicado       Boolean   @default(true)
+  observacoes     String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@index([tipo, publicado, vigencia_inicio])
+}
+
+model Product {
+  id          Int       @id @default(autoincrement())
+  nome        String
+  categoria   Category
+  // usa cêntimos para evitar issues de arredondamentos
+  precoCents  Int?      // null => "Sob consulta"
+  descricao   String?   @default("")
+  imagemUrl   String?
+  ativo       Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([categoria, nome])
+  @@index([ativo, categoria])
+  // @@unique([nome]) // ativa se quiseres forçar nomes únicos
+}
