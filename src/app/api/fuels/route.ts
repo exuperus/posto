@@ -1,9 +1,7 @@
-// src/app/api/fuels/route.ts
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
 import type { FuelType } from '@prisma/client'
 
-/** Rótulos legíveis por tipo */
 const LABELS: Partial<Record<FuelType, string>> = {
     GASOLEO: 'Gasóleo',
     GASOLEO_HI_ENERGY: 'Gasóleo Hi-Energy',
@@ -11,7 +9,6 @@ const LABELS: Partial<Record<FuelType, string>> = {
     GASOLEO_AGRICOLA: 'Gasóleo Agrícola',
 }
 
-/** Row que a API devolve ao Admin */
 type FuelApiRow = {
     tipo: FuelType
     preco_atual: string | null
@@ -20,16 +17,9 @@ type FuelApiRow = {
     updatedAt: string | null
 }
 
-/** Type guard para objetos tipo Prisma.Decimal */
 function hasToNumber(x: unknown): x is { toNumber: () => number } {
-    return (
-        typeof x === 'object' &&
-        x !== null &&
-        typeof (x as Record<string, unknown>).toNumber === 'function'
-    )
+    return typeof x === 'object' && x !== null && typeof (x as Record<string, unknown>).toNumber === 'function'
 }
-
-/** Converte valores (Decimal/string/number) em number seguro */
 function toNum(v: unknown): number | null {
     if (v == null) return null
     if (typeof v === 'number') return Number.isFinite(v) ? v : null
@@ -41,16 +31,13 @@ function toNum(v: unknown): number | null {
         try {
             const n = v.toNumber()
             return Number.isFinite(n) ? n : null
-        } catch {
-            /* ignore */
-        }
+        } catch {}
     }
     const n = Number(String(v))
     return Number.isFinite(n) ? n : null
 }
 
 export async function GET() {
-    // busca todos os publicados, mais recentes primeiro
     const rows = await prisma.fuel.findMany({
         where: { publicado: true },
         orderBy: [
@@ -68,7 +55,6 @@ export async function GET() {
         },
     })
 
-    // escolhe o registo mais recente por tipo
     const latest: Partial<Record<FuelType, typeof rows[number]>> = {}
     for (const r of rows) {
         const t = r.tipo as FuelType
@@ -80,7 +66,6 @@ export async function GET() {
         const precoAnterior = toNum(r!.preco_anterior)
         return {
             tipo: r!.tipo as FuelType,
-            // devolvemos como string (ou null) para evitar problemas de precisão/Decimal no cliente
             preco_atual: precoAtual !== null ? String(precoAtual) : null,
             preco_anterior: precoAnterior !== null ? String(precoAnterior) : null,
             vigencia_inicio: r!.vigencia_inicio ? r!.vigencia_inicio.toISOString() : null,
@@ -88,7 +73,5 @@ export async function GET() {
         }
     })
 
-    return NextResponse.json<FuelApiRow[]>(data, {
-        headers: { 'Cache-Control': 'no-store' },
-    })
+    return NextResponse.json<FuelApiRow[]>(data, { headers: { 'Cache-Control': 'no-store' } })
 }

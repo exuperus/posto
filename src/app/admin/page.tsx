@@ -5,8 +5,8 @@ type Tipo = 'GASOLEO' | 'GASOLEO_HI_ENERGY' | 'GASOLINA_95'
 
 type Row = {
     tipo: Tipo
-    preco_atual: number            // número (0 se vazio)
-    preco_anterior: number | null  // pode ser nulo
+    preco_atual: number
+    preco_anterior: number | null
 }
 
 type FuelApiRow = {
@@ -46,10 +46,8 @@ export default function AdminPage() {
                     if (i >= 0) {
                         next[i] = {
                             ...next[i],
-                            preco_atual:
-                                f.preco_atual == null ? 0 : Number(String(f.preco_atual).replace(',', '.')),
-                            preco_anterior:
-                                f.preco_anterior == null ? null : Number(String(f.preco_anterior).replace(',', '.')),
+                            preco_atual: f.preco_atual == null ? 0 : Number(String(f.preco_atual).replace(',', '.')),
+                            preco_anterior: f.preco_anterior == null ? null : Number(String(f.preco_anterior).replace(',', '.')),
                         }
                         if (!date && f.vigencia_inicio) {
                             setDate(new Date(f.vigencia_inicio).toISOString().slice(0, 10))
@@ -90,10 +88,7 @@ export default function AdminPage() {
         setMsg(null)
 
         const payload: { items: Array<Row & { vigencia_inicio: string | null }> } = {
-            items: rows.map((r) => ({
-                ...r,
-                vigencia_inicio: date || null,
-            })),
+            items: rows.map((r) => ({ ...r, vigencia_inicio: date || null })),
         }
 
         const res = await fetch('/api/admin/fuels', {
@@ -162,10 +157,7 @@ export default function AdminPage() {
                     </table>
                 </div>
 
-                <button
-                    className="rounded bg-black text-white px-4 py-2 disabled:opacity-60"
-                    disabled={saving}
-                >
+                <button className="rounded bg-black text-white px-4 py-2 disabled:opacity-60" disabled={saving}>
                     {saving ? 'A guardar…' : 'Guardar preços'}
                 </button>
 
@@ -174,4 +166,3 @@ export default function AdminPage() {
         </div>
     )
 }
-
