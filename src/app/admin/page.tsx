@@ -2,7 +2,20 @@
 import { useEffect, useState } from 'react'
 
 type Tipo = 'GASOLEO' | 'GASOLEO_HI_ENERGY' | 'GASOLINA_95'
-type Row = { tipo: Tipo; preco_atual: number; preco_anterior?: number | null }
+
+type Row = {
+    tipo: Tipo
+    preco_atual: number                // sempre número (0 se vazio)
+    preco_anterior: number | null      // pode ser nulo
+}
+
+type FuelApiRow = {
+    tipo: Tipo
+    preco_atual: string | null
+    preco_anterior: string | null
+    vigencia_inicio: string | null
+    updatedAt: string | null
+}
 
 const LABELS: Record<Tipo, string> = {
     GASOLEO: 'Gasóleo',
@@ -12,54 +25,84 @@ const LABELS: Record<Tipo, string> = {
 
 export default function AdminPage() {
     const [rows, setRows] = useState<Row[]>([
-        { tipo: 'GASOLEO', preco_atual: 0 },
-        { tipo: 'GASOLEO_HI_ENERGY', preco_atual: 0 },
-        { tipo: 'GASOLINA_95', preco_atual: 0 },
+        { tipo: 'GASOLEO', preco_atual: 0, preco_anterior: null },
+        { tipo: 'GASOLEO_HI_ENERGY', preco_atual: 0, preco_anterior: null },
+        { tipo: 'GASOLINA_95', preco_atual: 0, preco_anterior: null },
     ])
     const [date, setDate] = useState<string>('')
-    const [saving, setSaving] = useState(false)
+    const [saving, setSaving] = useState<boolean>(false)
     const [msg, setMsg] = useState<string | null>(null)
 
     useEffect(() => {
-        fetch('/api/fuels')
-            .then((r) => r.json())
-            .then((data: any[]) => {
-                const next = [...rows]
+        ;(async () => {
+            const r = await fetch('/api/fuels', { cache: 'no-store' })
+            if (!r.ok) return
+            const data: FuelApiRow[] = await r.json()
+
+            setRows((prev) => {
+                const next = [...prev]
                 for (const f of data) {
                     const i = next.findIndex((r) => r.tipo === f.tipo)
                     if (i >= 0) {
-                        next[i].preco_atual = Number(f.preco_atual)
-                        next[i].preco_anterior = f.preco_anterior ? Number(f.preco_anterior) : null
+                        next[i] = {
+                            ...next[i],
+                            preco_atual:
+                                f.preco_atual == null ? 0 : Number(String(f.preco_atual).replace(',', '.')),
+                            preco_anterior:
+                                f.preco_anterior == null ? null : Number(String(f.preco_anterior).replace(',', '.')),
+                        }
                         if (!date && f.vigencia_inicio) {
                             setDate(new Date(f.vigencia_inicio).toISOString().slice(0, 10))
                         }
                     }
                 }
-                setRows(next)
+                return next
             })
+        })()
+        // deps vazias: corre apenas no mount
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
-    function onChange(i: number, field: keyof Row, value: string) {
-        const n = [...rows]
-        if (field === 'preco_atual' || field === 'preco_anterior') {
-            ;(n[i] as any)[field] = value ? Number(value.replace(',', '.')) : null
-        } else {
-            ;(n[i] as any)[field] = value
-        }
-        setRows(n)
+    function onChange(
+        i: number,
+        field: 'preco_atual' | 'preco_anterior',
+        value: string
+    ) {
+        setRows((prev) =>
+            prev.map((r, idx) => {
+                if (idx !== i) return r
+                if (field === 'preco_atual') {
+                    const num = value.trim() === '' ? 0 : Number(value.replace(',', '.'))
+                    return { ...r, preco_atual: Number.isFinite(num) ? num : 0 }
+                } else {
+                    const num =
+                        value.trim() === '' ? null : Number(value.replace(',', '.'))
+                    return { ...r, preco_anterior: num === null || Number.isFinite(num) ? (num as number | null) : null }
+                }
+            })
+        )
     }
 
-    async function onSubmit(e: React.FormEvent) {
+    async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault()
         setSaving(true)
         setMsg(null)
-        const payload = { items: rows.map((r) => ({ ...r, vigencia_inicio: date || null })) }
+
+        const payload: {
+            items: Array<Row & { vigencia_inicio: string | null }>
+        } = {
+            items: rows.map((r) => ({
+                ...r,
+                vigencia_inicio: date || null,
+            })),
+        }
+
         const res = await fetch('/api/admin/fuels', {
             method: 'PUT',
             headers: { 'content-type': 'application/json' },
             body: JSON.stringify(payload),
         })
+
         setSaving(false)
         setMsg(res.ok ? 'Preços guardados com sucesso ✅' : 'Erro ao guardar')
     }
@@ -81,6 +124,7 @@ export default function AdminPage() {
                             />
                         </label>
                     </div>
+
                     <table className="w-full text-sm">
                         <thead className="bg-gray-50 text-left">
                         <tr>
@@ -93,15 +137,17 @@ export default function AdminPage() {
                         {rows.map((r, i) => (
                             <tr key={r.tipo} className="border-t">
                                 <td className="p-3 font-medium">{LABELS[r.tipo]}</td>
+
                                 <td className="p-3 text-right">
                                     <input
                                         className="w-28 text-right rounded border px-2 py-1"
-                                        value={r.preco_atual ?? ''}
+                                        value={r.preco_atual === 0 ? '' : r.preco_atual}
                                         onChange={(e) => onChange(i, 'preco_atual', e.target.value)}
                                         placeholder="0.00"
                                         inputMode="decimal"
                                     />
                                 </td>
+
                                 <td className="p-3 text-right">
                                     <input
                                         className="w-28 text-right rounded border px-2 py-1"
@@ -117,7 +163,10 @@ export default function AdminPage() {
                     </table>
                 </div>
 
-                <button className="rounded bg-black text-white px-4 py-2 disabled:opacity-60" disabled={saving}>
+                <button
+                    className="rounded bg-black text-white px-4 py-2 disabled:opacity-60"
+                    disabled={saving}
+                >
                     {saving ? 'A guardar…' : 'Guardar preços'}
                 </button>
 

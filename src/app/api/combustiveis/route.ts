@@ -1,7 +1,17 @@
+// src/app/api/combustiveis/route.ts
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
+import type { FuelType } from "@prisma/client";
 
 export const dynamic = "force-dynamic";
+
+type FuelDTO = {
+    tipo: FuelType;
+    preco_atual: string | null;
+    preco_anterior: string | null;
+    vigencia_inicio: string | null;
+    updatedAt: string | null;
+};
 
 export async function GET() {
     try {
@@ -17,7 +27,7 @@ export async function GET() {
             },
         });
 
-        const json = rows.map((r) => ({
+        const json: FuelDTO[] = rows.map((r): FuelDTO => ({
             tipo: r.tipo,
             preco_atual: r.preco_atual?.toString() ?? null,
             preco_anterior: r.preco_anterior?.toString() ?? null,
@@ -25,9 +35,14 @@ export async function GET() {
             updatedAt: r.updatedAt?.toISOString() ?? null,
         }));
 
-        return NextResponse.json(json, { headers: { "Cache-Control": "no-store" } });
-    } catch (e) {
+        return NextResponse.json<FuelDTO[]>(json, {
+            headers: { "Cache-Control": "no-store" },
+        });
+    } catch (e: unknown) {
+        // "e" é unknown por segurança; tenta extrair mensagem útil se existir
+        const message =
+            e instanceof Error ? e.message : "Erro inesperado ao obter combustíveis";
         console.error("Erro /api/combustiveis:", e);
-        return NextResponse.json({ error: "Erro interno" }, { status: 500 });
+        return NextResponse.json({ error: message }, { status: 500 });
     }
 }
