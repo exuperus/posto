@@ -15,26 +15,30 @@ function norm(s: string) {
     return s?.normalize("NFD").replace(/\p{Diacritic}/gu, "").toLowerCase() ?? "";
 }
 
-const toNum = (v: any): number | undefined => {
+function toNum(v: unknown): number | undefined {
     if (v == null) return undefined;
-    if (typeof v === "number") return v;
-    if (typeof v === "string") return Number(v.replace(",", "."));
+    if (typeof v === "number") return Number.isFinite(v) ? v : undefined;
+    if (typeof v === "string") {
+        const n = Number(v.replace(",", "."));
+        return Number.isFinite(n) ? n : undefined;
+    }
     if (typeof v === "object") {
-        if (typeof v.toNumber === "function") {
-            const n = v.toNumber();
+        const obj = v as { toNumber?: unknown; valueOf?: unknown; toString?: unknown };
+        if (typeof obj.toNumber === "function") {
+            const n = (obj.toNumber as () => number)();
             if (Number.isFinite(n)) return n;
         }
-        if (typeof v.valueOf === "function") {
-            const n = Number(v.valueOf());
+        if (typeof obj.valueOf === "function") {
+            const n = Number(obj.valueOf() as unknown);
             if (Number.isFinite(n)) return n;
         }
-        if (typeof v.toString === "function") {
-            const n = Number(String(v.toString()).replace(",", "."));
+        if (typeof obj.toString === "function") {
+            const n = Number(String(obj.toString()).replace(",", "."));
             if (Number.isFinite(n)) return n;
         }
     }
     return undefined;
-};
+}
 
 /* =======================
    🔢 FORMATADORES
@@ -60,29 +64,21 @@ const fmt = (n?: number | string) => {
 type FuelRow = {
     nome?: string;
     tipo?: string;
-    preco_atual?: any;
-    preco?: any;
-    price?: any;
-    valor?: any;
-    preco_anterior?: any;
+    preco_atual?: unknown;
+    preco?: unknown;
+    price?: unknown;
+    valor?: unknown;
+    preco_anterior?: unknown;
     vigencia_inicio?: string;
     updatedAt?: string;
     data?: string;
 };
 
-const TARGETS: Array<{ label: string; keys: string[]; tone: string }> = [
+const TARGETS: Array<{ label: string; keys: string[]; tone: "emerald" | "cyan" | "orange" | "lime" }> = [
     { label: "Gasóleo", keys: ["gasoleo", "diesel"], tone: "emerald" },
-    {
-        label: "Gasóleo Hi-Energy",
-        keys: ["gasoleo hi", "hi-energy", "hi energy"],
-        tone: "cyan",
-    },
+    { label: "Gasóleo Hi-Energy", keys: ["gasoleo hi", "hi-energy", "hi energy"], tone: "cyan" },
     { label: "Gasolina 95", keys: ["gasolina 95", "95"], tone: "orange" },
-    {
-        label: "Gasóleo Agrícola",
-        keys: ["gasoleo agricola", "agricola"],
-        tone: "lime",
-    },
+    { label: "Gasóleo Agrícola", keys: ["gasoleo agricola", "agricola"], tone: "lime" },
 ];
 
 /* =======================
@@ -142,8 +138,8 @@ export default async function CombustiveisPage() {
         const price =
             toNum(row?.preco_atual) ??
             toNum(row?.preco) ??
-            toNum((row as any)?.price) ??
-            toNum((row as any)?.valor);
+            toNum(row?.price) ??
+            toNum(row?.valor);
 
         const prev = toNum(row?.preco_anterior);
         const hasPrev = Number.isFinite(prev as number);
@@ -152,9 +148,7 @@ export default async function CombustiveisPage() {
                 ? (price as number) - (prev as number)
                 : undefined;
         const pct =
-            hasPrev &&
-            Number.isFinite(delta as number) &&
-            (prev as number) !== 0
+            hasPrev && Number.isFinite(delta as number) && (prev as number) !== 0
                 ? (delta as number) / (prev as number)
                 : undefined;
 

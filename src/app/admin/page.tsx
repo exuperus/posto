@@ -5,8 +5,8 @@ type Tipo = 'GASOLEO' | 'GASOLEO_HI_ENERGY' | 'GASOLINA_95'
 
 type Row = {
     tipo: Tipo
-    preco_atual: number                // sempre número (0 se vazio)
-    preco_anterior: number | null      // pode ser nulo
+    preco_atual: number            // número (0 se vazio)
+    preco_anterior: number | null  // pode ser nulo
 }
 
 type FuelApiRow = {
@@ -59,7 +59,6 @@ export default function AdminPage() {
                 return next
             })
         })()
-        // deps vazias: corre apenas no mount
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
@@ -75,9 +74,11 @@ export default function AdminPage() {
                     const num = value.trim() === '' ? 0 : Number(value.replace(',', '.'))
                     return { ...r, preco_atual: Number.isFinite(num) ? num : 0 }
                 } else {
-                    const num =
-                        value.trim() === '' ? null : Number(value.replace(',', '.'))
-                    return { ...r, preco_anterior: num === null || Number.isFinite(num) ? (num as number | null) : null }
+                    const num = value.trim() === '' ? null : Number(value.replace(',', '.'))
+                    return {
+                        ...r,
+                        preco_anterior: num === null || Number.isFinite(num) ? (num as number | null) : null,
+                    }
                 }
             })
         )
@@ -88,9 +89,7 @@ export default function AdminPage() {
         setSaving(true)
         setMsg(null)
 
-        const payload: {
-            items: Array<Row & { vigencia_inicio: string | null }>
-        } = {
+        const payload: { items: Array<Row & { vigencia_inicio: string | null }> } = {
             items: rows.map((r) => ({
                 ...r,
                 vigencia_inicio: date || null,
@@ -175,3 +174,4 @@ export default function AdminPage() {
         </div>
     )
 }
+
