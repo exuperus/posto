@@ -1,8 +1,8 @@
-// src/app/admin/login/page.tsx
-export const dynamic = 'force-static';
+// src/app/admin/login/page.tsx  (sem 'use client')
 export const metadata = { title: 'Login' };
 
+import LoginForm from './LoginForm';
+
 export default function AdminLoginPage() {
-  // módulo válido; não precisa UI agora
-  return null;
+  return <LoginForm />;
 }
