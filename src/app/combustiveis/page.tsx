@@ -1,8 +1,7 @@
-// src/app/combustiveis/page.tsx
 import { Fuel, TrendingUp, TrendingDown, TicketPercent } from "lucide-react";
 
-/* ===== PAGE IS DYNAMIC (SEM CACHE) ===== */
-export const dynamic = "force-dynamic";
+export const dynamic = "force-dynamic"; // força o runtime dinâmico
+export const revalidate = 0;            // desativa cache ISR
 
 /* =======================
    FUNÇÕES DE UTILIDADE

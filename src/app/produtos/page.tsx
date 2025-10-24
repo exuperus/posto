@@ -56,8 +56,10 @@ function baseUrl() {
 
 async function getProdutos(): Promise<Produto[]> {
     const res = await fetch(`${baseUrl()}/api/produtos`, { next: { revalidate: 300 } });
+    console.log(`${baseUrl()}/api/produtos`)
     const json = await res.json();
     const arr: ProdutoAPI[] = Array.isArray(json) ? json : json.data ?? [];
+    console.log(arr)
     return arr.map((p) => ({
         id: p.id,
         nome: p.nome,
