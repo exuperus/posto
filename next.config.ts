@@ -1,10 +1,8 @@
-// next.config.ts
-import type { NextConfig } from 'next'
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+    eslint: {
+        ignoreDuringBuilds: true,
+    },
+};
 
-const nextConfig: NextConfig = {
-    // ⚠️ TEMPORÁRIO: só para desbloquear o deploy
-    eslint: { ignoreDuringBuilds: true },
-    typescript: { ignoreBuildErrors: true },
-}
-
-export default nextConfig
+export default nextConfig;
