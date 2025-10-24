@@ -6,7 +6,7 @@ export async function POST(req: Request) {
         return NextResponse.json({ ok: false, error: 'Chave inválida' }, { status: 401 })
     }
     const res = NextResponse.json({ ok: true })
-    // cookie "ak" vale a ADMIN_KEY; expira em 7 dias
+
     res.cookies.set('ak', key, { httpOnly: true, sameSite: 'lax', maxAge: 60 * 60 * 24 * 7, path: '/' })
     return res
 }

@@ -1,6 +1,6 @@
 // src/app/api/combustiveis/route.ts
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/db";
+import { prisma } from "@/lib/prisma";
 import type { FuelType } from "@prisma/client";
 
 export const dynamic = "force-dynamic";
@@ -39,7 +39,7 @@ export async function GET() {
             headers: { "Cache-Control": "no-store" },
         });
     } catch (e: unknown) {
-        // "e" é unknown por segurança; tenta extrair mensagem útil se existir
+
         const message =
             e instanceof Error ? e.message : "Erro inesperado ao obter combustíveis";
         console.error("Erro /api/combustiveis:", e);

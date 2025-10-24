@@ -30,7 +30,7 @@ export async function GET() {
                 id: true,
                 nome: true,
                 categoria: true,
-                preco: true,        // <-- coluna real (Decimal)
+                precoCents: true,        // <-- coluna real (Decimal)
                 descricao: true,
                 imagemUrl: true,       // <-- confere com o schema (não "imagemUrl")
                 ativo: true,
@@ -40,7 +40,7 @@ export async function GET() {
         });
 
         const data = rows.map((r) => {
-            const preco = toNumber(r.preco);
+            const preco = toNumber(r.precoCents);
             return {
                 ...r,
                 preco,                                    // número em euros

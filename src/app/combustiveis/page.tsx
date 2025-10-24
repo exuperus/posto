@@ -2,7 +2,7 @@
 import { Fuel, TrendingUp, TrendingDown, TicketPercent } from "lucide-react";
 
 /* =======================
-   🔧 FUNÇÕES DE UTILIDADE
+   FUNÇÕES DE UTILIDADE
    ======================= */
 function getBaseUrl() {
     if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`;
@@ -41,7 +41,7 @@ function toNum(v: unknown): number | undefined {
 }
 
 /* =======================
-   🔢 FORMATADORES
+   FORMATADORES
    ======================= */
 const nf = new Intl.NumberFormat("pt-PT", {
     minimumFractionDigits: 3,
@@ -59,7 +59,7 @@ const fmt = (n?: number | string) => {
 };
 
 /* =======================
-   ⚙️ TIPOS E CONFIG
+   TIPOS E CONFIG
    ======================= */
 type FuelRow = {
     nome?: string;
@@ -82,7 +82,7 @@ const TARGETS: Array<{ label: string; keys: string[]; tone: "emerald" | "cyan" |
 ];
 
 /* =======================
-   🕒 PROMOÇÃO
+  PROMOÇÃO
    ======================= */
 const FRIDAY_DISCOUNT_EUR = 0.06;
 const FRIDAY_TIME = "07h–22h";
@@ -90,7 +90,7 @@ const FRIDAY_EXCEPT = "Gasóleo Agrícola";
 const isFriday = () => new Date().getDay() === 5;
 
 /* =======================
-   📈 SPARKLINE
+   SPARKLINE
    ======================= */
 function Sparkline({
                        prev,
@@ -120,7 +120,7 @@ function Sparkline({
 }
 
 /* =======================
-   🧭 PÁGINA PRINCIPAL
+   PÁGINA PRINCIPAL
    ======================= */
 export default async function CombustiveisPage() {
     const base = getBaseUrl();
@@ -172,7 +172,7 @@ export default async function CombustiveisPage() {
     const friday = isFriday();
 
     /* =======================
-       💅 UI FINAL
+       UI FINAL
        ======================= */
     return (
         <div className="space-y-6">
