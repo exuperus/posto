@@ -59,7 +59,7 @@ async function getProdutos(): Promise<Produto[]> {
     console.log(`${baseUrl()}/api/produtos`)
     const json = await res.json();
     const arr: ProdutoAPI[] = Array.isArray(json) ? json : json.data ?? [];
-    console.log(arr)
+    console.log(arr);
     return arr.map((p) => ({
         id: p.id,
         nome: p.nome,
@@ -67,6 +67,7 @@ async function getProdutos(): Promise<Produto[]> {
         descricao: p.descricao ?? "",
     }));
 }
+
 
 type PageProps = { searchParams: Promise<{ cat?: Categoria; q?: string }> };
 
