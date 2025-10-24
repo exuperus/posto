@@ -1,16 +1,12 @@
 // src/app/combustiveis/page.tsx
 import { Fuel, TrendingUp, TrendingDown, TicketPercent } from "lucide-react";
 
+/* ===== PAGE IS DYNAMIC (SEM CACHE) ===== */
+export const dynamic = "force-dynamic";
+
 /* =======================
    FUNÇÕES DE UTILIDADE
    ======================= */
-function getBaseUrl() {
-    if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`;
-    if (process.env.NEXT_PUBLIC_BASE_URL)
-        return process.env.NEXT_PUBLIC_BASE_URL.replace(/\/$/, "");
-    return "http://localhost:3000";
-}
-
 function norm(s: string) {
     return s?.normalize("NFD").replace(/\p{Diacritic}/gu, "").toLowerCase() ?? "";
 }
@@ -75,14 +71,14 @@ type FuelRow = {
 };
 
 const TARGETS: Array<{ label: string; keys: string[]; tone: "emerald" | "cyan" | "orange" | "lime" }> = [
-    { label: "Gasóleo", keys: ["gasoleo", "diesel"], tone: "emerald" },
-    { label: "Gasóleo Hi-Energy", keys: ["gasoleo hi", "hi-energy", "hi energy"], tone: "cyan" },
-    { label: "Gasolina 95", keys: ["gasolina 95", "95"], tone: "orange" },
-    { label: "Gasóleo Agrícola", keys: ["gasoleo agricola", "agricola"], tone: "lime" },
+    { label: "Gasóleo",            keys: ["gasoleo", "diesel"],            tone: "emerald" },
+    { label: "Gasóleo Hi-Energy",  keys: ["gasoleo hi", "hi-energy", "hi energy"], tone: "cyan" },
+    { label: "Gasolina 95",        keys: ["gasolina 95", "95"],            tone: "orange" },
+    { label: "Gasóleo Agrícola",   keys: ["gasoleo agricola", "agricola"], tone: "lime" },
 ];
 
 /* =======================
-  PROMOÇÃO
+   PROMOÇÃO
    ======================= */
 const FRIDAY_DISCOUNT_EUR = 0.06;
 const FRIDAY_TIME = "07h–22h";
@@ -123,9 +119,14 @@ function Sparkline({
    PÁGINA PRINCIPAL
    ======================= */
 export default async function CombustiveisPage() {
-    const base = getBaseUrl();
-    const res = await fetch(`${base}/api/combustiveis`, { cache: "no-store" });
-    const all: FuelRow[] = res.ok ? await res.json() : [];
+    // fetch RELATIVO para funcionar no build e em runtime no Vercel
+    let all: FuelRow[] = [];
+    try {
+        const res = await fetch(`/api/combustiveis`, { cache: "no-store" });
+        if (res.ok) all = await res.json();
+    } catch {
+        all = []; // se a API falhar, renderizamos UI vazia (sem crash)
+    }
 
     const pick = (keys: string[]) =>
         all.find((f) => {
@@ -171,9 +172,6 @@ export default async function CombustiveisPage() {
 
     const friday = isFriday();
 
-    /* =======================
-       UI FINAL
-       ======================= */
     return (
         <div className="space-y-6">
             {/* ===== CABEÇALHO ===== */}
@@ -269,8 +267,7 @@ export default async function CombustiveisPage() {
                                             className={[
                                                 "inline-flex items-center gap-1 rounded-full px-2 py-1 text-xs",
                                                 down && "bg-red-50 text-red-700 ring-1 ring-red-100",
-                                                up &&
-                                                "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-100",
+                                                up && "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-100",
                                                 !down && !up && "bg-gray-100 text-gray-700",
                                             ]
                                                 .filter(Boolean)
@@ -283,9 +280,7 @@ export default async function CombustiveisPage() {
                       ) : null}
                                             {nf.format(Math.abs(it.delta ?? 0))} €
                                             {it.pct !== undefined && (
-                                                <span className="opacity-70">
-                          ({pf.format(Math.abs(it.pct))})
-                        </span>
+                                                <span className="opacity-70">({pf.format(Math.abs(it.pct))})</span>
                                             )}
                     </span>
                                     )}
@@ -320,13 +315,9 @@ export default async function CombustiveisPage() {
                                             {it.delta === undefined ? (
                                                 <span className="text-gray-600">—</span>
                                             ) : down ? (
-                                                <span className="text-red-600">
-                          ↓ em {nf.format(Math.abs(it.delta))} €
-                        </span>
+                                                <span className="text-red-600">↓ em {nf.format(Math.abs(it.delta))} €</span>
                                             ) : up ? (
-                                                <span className="text-emerald-600">
-                          ↑ em {nf.format(Math.abs(it.delta))} €
-                        </span>
+                                                <span className="text-emerald-600">↑ em {nf.format(Math.abs(it.delta))} €</span>
                                             ) : (
                                                 <span className="text-gray-600">Estável</span>
                                             )}
@@ -343,8 +334,7 @@ export default async function CombustiveisPage() {
             <p className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
                 <strong>Promoção de Sexta-feira:</strong> desconto direto de{" "}
                 <strong>{nf.format(FRIDAY_DISCOUNT_EUR)} € / L</strong> em todas as
-                categorias de combustível{" "}
-                <strong>exceto {FRIDAY_EXCEPT}</strong>. Válida todas as sextas-feiras,
+                categorias de combustível <strong>exceto {FRIDAY_EXCEPT}</strong>. Válida todas as sextas-feiras,
                 das <strong>{FRIDAY_TIME}</strong>.
             </p>
         </div>
