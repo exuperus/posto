@@ -1,25 +1,21 @@
+// src/app/api/produtos/route.ts
 import { NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "@/lib/prisma";
+import type { Category } from "@prisma/client";
 
-const prisma = new PrismaClient();
+export const dynamic = "force-dynamic";
 
-// Converte Prisma.Decimal → number
-function toNumber(v: unknown): number | null {
-    if (v == null) return null;
-    if (typeof v === "number" && Number.isFinite(v)) return v;
-    if (typeof v === "string") {
-        const n = Number(v.replace(",", "."));
-        return Number.isFinite(n) ? n : null;
-    }
-    if (typeof v === "object" && v && "toNumber" in (v as any)) {
-        try {
-            const n = (v as any).toNumber();
-            return Number.isFinite(n) ? n : null;
-        } catch {}
-    }
-    const n = Number(String(v));
-    return Number.isFinite(n) ? n : null;
-}
+// Se o UI precisar do preço, expomos "preco" (euros) podendo ser null.
+// Se não precisares mesmo, comenta o campo "preco" no tipo e no map.
+type ProdutoDTO = {
+    id: number;
+    nome: string;
+    categoria: Category;
+    preco: number | null;        // <- null quando não há preço
+    descricao: string | null;
+    imagemUrl: string | null;
+    ativo: boolean;
+};
 
 export async function GET() {
     try {
@@ -30,32 +26,26 @@ export async function GET() {
                 id: true,
                 nome: true,
                 categoria: true,
-                precoCents: true,        // <-- coluna real (Decimal)
+                precoCents: true,     // pode vir null e está tudo bem
                 descricao: true,
-                imagemUrl: true,       // <-- confere com o schema (não "imagemUrl")
+                imagemUrl: true,
                 ativo: true,
-                createdAt: true,
-                updatedAt: true,
             },
         });
 
-        const data = rows.map((r) => {
-            const preco = toNumber(r.precoCents);
-            return {
-                ...r,
-                preco,                                    // número em euros
-                precoCents: preco != null ? Math.round(preco * 100) : null,
-            };
-        });
+        const data: ProdutoDTO[] = rows.map((r) => ({
+            id: r.id,
+            nome: r.nome,
+            categoria: r.categoria,
+            preco: r.precoCents == null ? null : r.precoCents / 100, // null => sem preço
+            descricao: r.descricao ?? null,
+            imagemUrl: r.imagemUrl ?? null,
+            ativo: r.ativo,
+        }));
 
-        return NextResponse.json(data, {
-            headers: { "Cache-Control": "no-store" },
-        });
+        return NextResponse.json(data, { headers: { "Cache-Control": "no-store" } });
     } catch (e) {
         console.error("GET /api/produtos:", e);
-        return NextResponse.json(
-            { error: "Falha a obter produtos" },
-            { status: 500 }
-        );
+        return NextResponse.json({ error: "Falha a obter produtos" }, { status: 500 });
     }
 }
