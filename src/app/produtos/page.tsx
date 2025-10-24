@@ -56,7 +56,7 @@ function baseUrl() {
 
 async function getProdutos(): Promise<Produto[]> {
     const res = await fetch(`${baseUrl()}/api/produtos`, { next: { revalidate: 300 } });
-    console.log(`${baseUrl()}/api/produtos`)
+    console.log(`${baseUrl()}/api/produtos`);
     const json = await res.json();
     const arr: ProdutoAPI[] = Array.isArray(json) ? json : json.data ?? [];
     console.log(arr);
@@ -67,7 +67,6 @@ async function getProdutos(): Promise<Produto[]> {
         descricao: p.descricao ?? "",
     }));
 }
-
 
 type PageProps = { searchParams: Promise<{ cat?: Categoria; q?: string }> };
 
