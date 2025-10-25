@@ -51,7 +51,7 @@ export default function TransportePage() {
                     alt="Transporte ao domicílio"
                     fill
                     priority
-                    className="object-contain"
+                    className="object-cover"
                 />
             </div>
 

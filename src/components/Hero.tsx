@@ -15,7 +15,7 @@ export default function Hero({
                 alt={title}
                 fill
                 priority
-                className="object-cover sm:object-contain"
+                className="object-cover"
                 sizes="100vw"
             />
 

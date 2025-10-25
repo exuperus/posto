@@ -59,7 +59,7 @@ export default function ContactosPage() {
                     alt="Contacte-nos"
                     fill
                     priority
-                    className="object-cover sm:object-contain"
+                    className="object-cover"
                 />
             </section>
 
