@@ -142,11 +142,17 @@ export default function FuelCalculator() {
                         onChange={(e) => setSelectedFuel(e.target.value)}
                         className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     >
-                        {fuelPrices.map((fuel) => (
-                            <option key={fuel.tipo} value={fuel.tipo}>
-                                {fuel.tipo} - {formatPrice(fuel.preco)}/L
-                            </option>
-                        ))}
+                        {fuelPrices.map((fuel) => {
+                            const formattedTipo = fuel.tipo
+                                .toLowerCase()
+                                .replace(/_/g, " ")
+                                .replace(/\b\w/g, (c) => c.toUpperCase());
+                            return (
+                                <option key={fuel.tipo} value={fuel.tipo}>
+                                    {formattedTipo} - {formatPrice(fuel.preco)}/L
+                                </option>
+                            );
+                        })}
                     </select>
                 </div>
 

@@ -36,14 +36,9 @@ export default function LoyaltyCounter() {
             return {
                 icon: <Heart className="h-5 w-5" />,
                 message: "Bem-vindo! Obrigado pela sua primeira visita!",
-                color: "from-pink-500 to-pink-600"
+                color: "from-gray-500 to-gray-600"
             };
-        } else if (visitCount % 10 === 0) {
-            return {
-                icon: <Gift className="h-5 w-5" />,
-                message: `Cliente VIP! ${visitCount} visitas - Peça o seu desconto especial!`,
-                color: "from-purple-500 to-purple-600"
-            };
+
         } else if (visitCount % 5 === 0) {
             return {
                 icon: <Star className="h-5 w-5" />,
