@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import MobileMenu from "./MobileMenu";
 
 export default function Header() {
     const pathname = usePathname();
@@ -21,21 +22,26 @@ export default function Header() {
     console.log("[Header] Links definidos:", links);
 
     return (
-        <header
-            className={[
-                "z-40 w-full",
-                isHome
-                    ? "absolute top-0 left-0 right-0 bg-gradient-to-b from-black/45 to-transparent"
-                    : "sticky top-0 bg-white/90 backdrop-blur border-b border-gray-200",
-            ].join(" ")}
-        >
-            <div className="flex items-center justify-end px-8 h-16">
-                <nav
-                    className={[
-                        "flex gap-6 text-sm md:text-base font-medium",
-                        isHome ? "text-white drop-shadow" : "text-gray-800",
-                    ].join(" ")}
-                >
+        <>
+            {/* Menu Mobile */}
+            <MobileMenu isHome={isHome} />
+            
+            {/* Header Desktop */}
+            <header
+                className={[
+                    "z-40 w-full",
+                    isHome
+                        ? "absolute top-0 left-0 right-0 bg-gradient-to-b from-black/45 to-transparent"
+                        : "sticky top-0 bg-white/90 backdrop-blur border-b border-gray-200",
+                ].join(" ")}
+            >
+                <div className="flex items-center justify-end px-8 h-16">
+                    <nav
+                        className={[
+                            "hidden md:flex gap-6 text-sm md:text-base font-medium",
+                            isHome ? "text-white drop-shadow" : "text-gray-800",
+                        ].join(" ")}
+                    >
                     {links.map(({ href, label }) => {
                         const active = pathname === href;
                         console.log(`[Header] Link: ${label} (${href}) → active =`, active);
@@ -65,8 +71,9 @@ export default function Header() {
                             </Link>
                         );
                     })}
-                </nav>
-            </div>
-        </header>
+                    </nav>
+                </div>
+            </header>
+        </>
     );
 }

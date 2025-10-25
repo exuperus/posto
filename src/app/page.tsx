@@ -1,4 +1,5 @@
 import Hero from "@/components/Hero";
+import QuickActions from "@/components/QuickActions";
 import { headers } from "next/headers";
 
 export const revalidate = 1800;
@@ -56,7 +57,12 @@ export default async function HomePage() {
     console.log("[/HomePage] Título definido:", title);
 
     console.log("[/HomePage] A renderizar componente <Hero />.");
-    const element = <Hero title={title} />;
+    const element = (
+        <>
+            <Hero title={title} />
+            <QuickActions />
+        </>
+    );
     console.log("[/HomePage] Render concluído.\n");
 
     return element;

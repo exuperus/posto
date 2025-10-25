@@ -2,6 +2,8 @@ import { Fuel, TrendingUp, TrendingDown, TicketPercent } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import type { FuelType } from "@prisma/client";
 import BackButton from "@/components/BackButton";
+import Breadcrumbs from "@/components/Breadcrumbs";
+import RelatedPages from "@/components/RelatedPages";
 
 export const dynamic = "force-dynamic"; // força o runtime dinâmico
 export const revalidate = 0;            // desativa cache ISR
@@ -220,6 +222,7 @@ export default async function CombustiveisPage() {
     return (
         <div className="space-y-6">
             <BackButton />
+            <Breadcrumbs />
             {/* ===== CABEÇALHO ===== */}
             <header className="flex items-end justify-between gap-4">
                 <div className="space-y-2">
@@ -395,6 +398,9 @@ export default async function CombustiveisPage() {
                 categorias de combustível <strong>exceto {FRIDAY_EXCEPT}</strong>. Válida todas as sextas-feiras,
                 das <strong>{FRIDAY_TIME}</strong>.
             </p>
+
+            {/* Páginas relacionadas */}
+            <RelatedPages />
         </div>
     );
 }

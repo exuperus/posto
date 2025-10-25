@@ -2,6 +2,8 @@
 
 import Image from "next/image";
 import BackButton from "@/components/BackButton";
+import Breadcrumbs from "@/components/Breadcrumbs";
+import RelatedPages from "@/components/RelatedPages";
 
 // ===== DEBUG DE AMBIENTE (avaliado no load do módulo)
 const PHONE = process.env.NEXT_PUBLIC_PHONE ?? "938452320";
@@ -37,6 +39,7 @@ export default function ContactosPage() {
     return (
         <div className="relative">
             <BackButton />
+            <Breadcrumbs />
             {/* HERO */}
             <section className="relative h-[42vh] min-h-[320px] w-full overflow-hidden rounded-b-3xl">
                 <Image
@@ -103,6 +106,9 @@ export default function ContactosPage() {
                     </article>
                 </div>
             </section>
+
+            {/* Páginas relacionadas */}
+            <RelatedPages />
         </div>
     );
 }
