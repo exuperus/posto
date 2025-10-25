@@ -1,3 +1,4 @@
+// src/app/layout.tsx
 import "./globals.css";
 import type { Metadata } from "next";
 import Shell from "@/components/Shell";
@@ -12,11 +13,10 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
     return (
         <html lang="pt-PT">
-        <body className="min-h-dvh bg-gray-50 text-gray-900 flex flex-col">
+        {/* fundo branco forçado + fallback min-h para browsers sem dvh */}
+        <body className="min-h-screen supports-[min-height:100dvh]:min-h-dvh bg-white text-gray-900 antialiased flex flex-col">
         <Shell>{children}</Shell>
-
         <CookieNotice />
-
         <LegalFooter />
         </body>
         </html>

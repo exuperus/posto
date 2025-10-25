@@ -1,15 +1,18 @@
+/* src/app/globals.css */
 @import "tailwindcss";
 
-/* ======= Tokens base ======= */
+/* ======= Tokens base (forçar claro) ======= */
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  color-scheme: light; /* dica p/ browser: sempre claro */
 }
 
+/* Neutraliza preferências do SO (mantém claro mesmo em dark mode) */
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #ffffff;
+    --foreground: #171717;
   }
 }
 
@@ -20,47 +23,39 @@
   --color-brand-dark: #7EB100;  /* estado hover/active */
   --color-ink: #0B0F0E;         /* escuro */
 
-  /* Herdar os teus tokens existentes para poder usar como classes */
+  /* Herdar os tokens */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
 
-  /* Tipografia (se tiveres next/font a definir estas vars, ótimo; caso não, o body já tem fallback) */
+  /* Tipografia (se usares next/font, estas vars serão preenchidas) */
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 
-  /* Estilo extra “nível Galp/Prio” */
-  --radius-xl2: 1.25rem;               /* => rounded-xl2 */
-  --shadow-card: 0 10px 25px -10px rgba(0,0,0,0.15); /* => shadow-card */
+  /* Extras */
+  --radius-xl2: 1.25rem;
+  --shadow-card: 0 10px 25px -10px rgba(0,0,0,0.15);
 }
 
 /* ======= Resets simples ======= */
+html, body { height: 100%; }
+
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif; /* fallback; se usares next/font, mantém também a classe no <html> */
+  font-family: Arial, Helvetica, sans-serif; /* fallback */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-/* ======= Utilitários de UI prontos a usar ======= */
+/* ======= Utilitários ======= */
 @layer utilities {
-  .container-pro {
-    @apply mx-auto max-w-6xl px-4;
-  }
+  .container-pro { @apply mx-auto max-w-6xl px-4; }
 
-  /* base de botão (não é usada via @apply noutros sítios) */
-  .btn {
-    @apply inline-flex items-center justify-center rounded-xl px-5 py-3 font-semibold transition;
-  }
+  .btn { @apply inline-flex items-center justify-center rounded-xl px-5 py-3 font-semibold transition; }
 
-  /* variantes SEM @apply .btn (repetimos as utilities base) */
-  .btn-brand {
-    @apply inline-flex items-center justify-center rounded-xl px-5 py-3 font-semibold transition bg-brand text-ink hover:bg-brand-dark;
-  }
+  .btn-brand { @apply inline-flex items-center justify-center rounded-xl px-5 py-3 font-semibold transition bg-brand text-ink hover:bg-brand-dark; }
 
-  .btn-ghost {
-    @apply inline-flex items-center justify-center rounded-xl px-5 py-3 font-semibold transition border border-gray-200 hover:bg-gray-50;
-  }
+  .btn-ghost { @apply inline-flex items-center justify-center rounded-xl px-5 py-3 font-semibold transition border border-gray-200 hover:bg-gray-50; }
 
-  .card {
-    @apply rounded-xl border border-gray-200 bg-white p-5 shadow-card;
-  }
+  .card { @apply rounded-xl border border-gray-200 bg-white p-5 shadow-card; }
 }
