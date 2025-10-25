@@ -1,4 +1,6 @@
 import { Fuel, TrendingUp, TrendingDown, TicketPercent } from "lucide-react";
+import { prisma } from "@/lib/prisma";
+import type { FuelType } from "@prisma/client";
 
 export const dynamic = "force-dynamic"; // força o runtime dinâmico
 export const revalidate = 0;            // desativa cache ISR
@@ -57,16 +59,11 @@ const fmt = (n?: number | string) => {
    TIPOS E CONFIG
    ======================= */
 type FuelRow = {
-    nome?: string;
-    tipo?: string;
-    preco_atual?: unknown;
-    preco?: unknown;
-    price?: unknown;
-    valor?: unknown;
-    preco_anterior?: unknown;
-    vigencia_inicio?: string;
-    updatedAt?: string;
-    data?: string;
+    tipo: FuelType;
+    preco_atual: number | null;
+    preco_anterior: number | null;
+    vigencia_inicio: Date | null;
+    updatedAt: Date;
 };
 
 const TARGETS: Array<{ label: string; keys: string[]; tone: "emerald" | "cyan" | "orange" | "lime" }> = [
@@ -123,29 +120,38 @@ function Sparkline({
 export default async function CombustiveisPage() {
     console.log("[/combustiveis] Render iniciado. NODE_ENV:", process.env.NODE_ENV, "VERCEL:", !!process.env.VERCEL);
 
-    // fetch RELATIVO para funcionar no build e em runtime no Vercel
+    // Busca direta no Prisma
     let all: FuelRow[] = [];
     try {
-        console.log("[/combustiveis] A chamar GET /api/combustiveis ...");
-        const res = await fetch(`/api/combustiveis`, { cache: "no-store" });
-        console.log("[/combustiveis] Resposta API status:", res.status, res.statusText);
-        if (res.ok) {
-            all = await res.json();
-            console.log(" [/combustiveis] JSON recebido. Registos:", Array.isArray(all) ? all.length : "não é array");
-            if (Array.isArray(all) && all.length > 0) {
-                console.log("[/combustiveis] Exemplo 1º registo:", all[0]);
-            }
+        console.log("[/combustiveis] A consultar Prisma (tabela fuel)...");
+        
+        const rows = await prisma.fuel.findMany({
+            where: { publicado: true },
+            orderBy: { tipo: "asc" },
+            select: {
+                tipo: true,
+                preco_atual: true,
+                preco_anterior: true,
+                vigencia_inicio: true,
+                updatedAt: true,
+            },
+        });
+
+        all = rows;
+        console.log(`[/combustiveis] Query concluída — ${rows.length} registos encontrados.`);
+        if (rows.length > 0) {
+            console.log("[/combustiveis] Exemplo 1º registo:", rows[0]);
         } else {
-            console.warn("⚠[/combustiveis] Resposta não OK de /api/combustiveis");
+            console.warn("⚠[/combustiveis] Nenhum combustível publicado encontrado.");
         }
     } catch (err) {
-        console.error("[/combustiveis] Falha no fetch /api/combustiveis:", err);
-        all = []; // se a API falhar, renderizamos UI vazia (sem crash)
+        console.error("[/combustiveis] Falha na consulta Prisma:", err);
+        all = []; // se a consulta falhar, renderizamos UI vazia (sem crash)
     }
 
     const pick = (keys: string[]) =>
         all.find((f) => {
-            const raw = (f.nome || f.tipo || "");
+            const raw = f.tipo;
             const name = norm(raw.replace(/_/g, " "));
             const hit = keys.some((k) => name.includes(k));
             console.log("🔎 [/combustiveis] pick() raw:", raw, "norm:", name, "keys:", keys, "→ hit:", hit);
@@ -155,13 +161,9 @@ export default async function CombustiveisPage() {
     console.log("[/combustiveis] A construir items a partir de TARGETS...");
     const items = TARGETS.map((t, idx) => {
         const row = pick(t.keys.map(norm));
-        const price =
-            toNum(row?.preco_atual) ??
-            toNum(row?.preco) ??
-            toNum(row?.price) ??
-            toNum(row?.valor);
+        const price = row?.preco_atual ?? undefined;
 
-        const prev = toNum(row?.preco_anterior);
+        const prev = row?.preco_anterior ?? undefined;
         const hasPrev = Number.isFinite(prev as number);
         const delta =
             hasPrev && Number.isFinite(price as number)
@@ -172,7 +174,7 @@ export default async function CombustiveisPage() {
                 ? (delta as number) / (prev as number)
                 : undefined;
 
-        const updated = row?.updatedAt ?? row?.vigencia_inicio ?? row?.data;
+        const updated = row?.updatedAt ?? row?.vigencia_inicio;
 
         const debugRow = {
             label: t.label,
