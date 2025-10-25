@@ -53,7 +53,7 @@ export default async function HomePage() {
     const station = await getStation();
     console.log("[/HomePage] station:", station);
 
-    const title = (station as any)?.nome_comercial ?? "Sandrina & Mário, LDA";
+    const title = "Sandrina & Mário, LDA";
     console.log("[/HomePage] Título definido:", title);
 
     console.log("[/HomePage] A renderizar componente <Hero />.");

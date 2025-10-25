@@ -1,5 +1,6 @@
 // src/app/produtos/page.tsx
 import Link from "next/link";
+import Image from "next/image";
 import { JSX } from "react";
 import { Droplets, Beaker, Sparkles, Package } from "lucide-react";
 import TabsNav from "@/components/produtos/TabsNav";
@@ -38,6 +39,7 @@ type Produto = {
     nome: string;
     categoria: Categoria;
     descricao: string;
+    imagemUrl?: string | null;
 };
 
 const labels: Record<Categoria, string> = {
@@ -69,7 +71,7 @@ async function getProdutos(): Promise<Produto[]> {
     const rows = await prisma.product.findMany({
         where: { ativo: true },
         orderBy: [{ categoria: "asc" }, { nome: "asc" }],
-        select: { id: true, nome: true, categoria: true, descricao: true },
+        select: { id: true, nome: true, categoria: true, descricao: true, imagemUrl: true },
     });
 
     return rows.map((r) => ({
@@ -77,6 +79,7 @@ async function getProdutos(): Promise<Produto[]> {
         nome: r.nome,
         categoria: r.categoria as Categoria,
         descricao: r.descricao ?? "",
+        imagemUrl: r.imagemUrl,
     }));
 }
 
@@ -139,17 +142,29 @@ export default async function ProdutosPage(props: PageProps) {
                             key={p.id}
                             className="group rounded-2xl border ring-1 shadow-sm bg-white overflow-hidden hover:shadow-md transition"
                         >
-                            {/* Header decorativo por categoria */}
-                            <div className={["relative h-28 bg-gradient-to-br", colors[p.categoria]].join(" ")}>
-                                <svg className="absolute inset-0 h-full w-full opacity-15 mix-blend-overlay" aria-hidden="true">
-                                    <defs>
-                                        <pattern id={`dots-${p.id}`} width="16" height="16" patternUnits="userSpaceOnUse">
-                                            <circle cx="1" cy="1" r="1"></circle>
-                                        </pattern>
-                                    </defs>
-                                    <rect width="100%" height="100%" fill={`url(#dots-${p.id})`} />
-                                </svg>
-                                <div className="absolute -right-2 -bottom-2 opacity-20 scale-150">{icons[p.categoria]}</div>
+                            {/* Header com imagem ou decorativo por categoria */}
+                            <div className="relative h-28 overflow-hidden">
+                                {p.imagemUrl ? (
+                                    <Image
+                                        src={p.imagemUrl}
+                                        alt={p.nome}
+                                        fill
+                                        className="object-cover"
+                                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                                    />
+                                ) : (
+                                    <div className={["h-full bg-gradient-to-br", colors[p.categoria]].join(" ")}>
+                                        <svg className="absolute inset-0 h-full w-full opacity-15 mix-blend-overlay" aria-hidden="true">
+                                            <defs>
+                                                <pattern id={`dots-${p.id}`} width="16" height="16" patternUnits="userSpaceOnUse">
+                                                    <circle cx="1" cy="1" r="1"></circle>
+                                                </pattern>
+                                            </defs>
+                                            <rect width="100%" height="100%" fill={`url(#dots-${p.id})`} />
+                                        </svg>
+                                        <div className="absolute -right-2 -bottom-2 opacity-20 scale-150">{icons[p.categoria]}</div>
+                                    </div>
+                                )}
                             </div>
 
                             {/* Corpo */}

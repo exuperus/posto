@@ -418,13 +418,6 @@ export default async function CombustiveisPage() {
                 })}
             </section>
 
-            {/* ===== RODAPÉ PROMO ===== */}
-            <p className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
-                <strong>Promoção de Sexta-feira:</strong> desconto direto de{" "}
-                <strong>{nf.format(FRIDAY_DISCOUNT_EUR)} € / L</strong> em todas as
-                categorias de combustível <strong>exceto {FRIDAY_EXCEPT}</strong>. Válida todas as sextas-feiras,
-                das <strong>{FRIDAY_TIME}</strong>.
-            </p>
 
             {/* Páginas relacionadas */}
             <RelatedPages />

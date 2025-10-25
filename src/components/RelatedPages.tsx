@@ -113,10 +113,10 @@ export default function RelatedPages() {
         <section className="mt-16 pt-8 border-t border-gray-200">
             <div className="max-w-6xl mx-auto px-4">
                 <div className="text-center mb-8">
-                    <h3 className="text-2xl font-bold text-gray-900 mb-2">
+                    <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900 mb-2">
                         Também pode interessar-lhe
                     </h3>
-                    <p className="text-gray-600">
+                    <p className="text-sm sm:text-base text-gray-600">
                         Explore outros serviços que temos para si
                     </p>
                 </div>

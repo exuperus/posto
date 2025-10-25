@@ -8,7 +8,7 @@ export default function Hero({
     title?: string
 }) {
     return (
-        <section className="relative h-[100dvh] w-full overflow-hidden">
+        <section className="relative h-[70vh] min-h-[300px] max-h-[500px] w-full overflow-hidden">
             {/* Imagem de fundo */}
             <Image
                 src="/hero.png"
@@ -19,20 +19,12 @@ export default function Hero({
                 sizes="100vw"
             />
 
-            {/* Overlay para legibilidade */}
-            <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/30 to-transparent" />
+            {/* Overlay para legibilidade - muito forte na parte inferior para esconder texto */}
+            <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/10 to-black/90" />
+            
+            {/* Overlay adicional na parte inferior para esconder texto da imagem */}
+            <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-black/95 to-transparent" />
 
-            {/* TÍTULO animado — canto superior esquerdo */}
-            <motion.h1
-                initial={{ opacity: 0, y: 40 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 1.2, ease: 'easeOut' }}
-                className="absolute top-8 left-8 z-10 font-extrabold text-2xl md:text-4xl
-                   leading-snug tracking-tight bg-gradient-to-b from-white via-white/95 to-lime-300
-                   bg-clip-text text-transparent drop-shadow-[0_6px_15px_rgba(0,0,0,0.5)]"
-            >
-                {title}
-            </motion.h1>
         </section>
     )
 }

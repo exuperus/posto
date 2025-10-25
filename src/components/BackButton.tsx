@@ -25,7 +25,7 @@ export default function BackButton({ className = "", fallbackHref = "/" }: BackB
         <button
             onClick={handleBack}
             className={`
-                fixed top-20 left-4 z-40
+                fixed top-4 right-4 z-40
                 inline-flex items-center gap-2
                 bg-white/90 backdrop-blur-sm
                 border border-gray-200
@@ -34,7 +34,7 @@ export default function BackButton({ className = "", fallbackHref = "/" }: BackB
                 shadow-lg hover:shadow-xl
                 hover:bg-white hover:text-gray-900
                 transition-all duration-200
-                md:left-4
+                md:left-4 md:right-auto
                 ${className}
             `}
             aria-label="Voltar à página anterior"
