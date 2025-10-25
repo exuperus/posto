@@ -5,6 +5,7 @@ import { Droplets, Beaker, Sparkles, Package } from "lucide-react";
 import TabsNav from "@/components/produtos/TabsNav";
 import SearchFormClient from "@/components/produtos/SearchFormClient";
 import ContactBar from "@/components/produtos/ContactBar";
+import { prisma } from "@/lib/prisma"; // ✅ lê direto do Prisma (sem fetch)
 
 export const revalidate = 300;
 
@@ -12,21 +13,7 @@ export const revalidate = 300;
 const PHONE = process.env.NEXT_PUBLIC_PHONE ?? "911 111 111";
 const WHATS = (process.env.NEXT_PUBLIC_WHATS ?? PHONE).replace(/\s+/g, "");
 
-console.log("[/produtos] Módulo carregado");
-console.log("   - NODE_ENV:", process.env.NODE_ENV);
-console.log("   - VERCEL:", !!process.env.VERCEL);
-console.log("   - NEXT_PUBLIC_PHONE:", PHONE);
-console.log("   - NEXT_PUBLIC_WHATS:", WHATS);
-console.log("   - revalidate:", revalidate);
-
 type Categoria = "LUBRIFICANTES" | "ADITIVOS" | "LAVAGEM" | "ACESSORIOS" | "OUTROS";
-
-type ProdutoAPI = {
-    id: number;
-    nome: string;
-    categoria: Categoria;
-    descricao?: string | null;
-};
 
 type Produto = {
     id: number;
@@ -59,72 +46,37 @@ const icons: Record<Categoria, JSX.Element> = {
     OUTROS: <Package className="h-7 w-7" />,
 };
 
-function baseUrl() {
-    if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`;
-    if (process.env.NEXT_PUBLIC_BASE_URL) return process.env.NEXT_PUBLIC_BASE_URL.replace(/\/$/, "");
-    return "http://localhost:3000";
-}
-
+// ✅ Lê direto da BD (evita problemas de URL/fetch)
 async function getProdutos(): Promise<Produto[]> {
-    const url = `${baseUrl()}/api/produtos`;
-    console.log("[/produtos] GET", url);
-    try {
-        const res = await fetch(url, { next: { revalidate: 300 } });
-        console.log("[/produtos] /api/produtos status:", res.status, res.statusText);
-        const json = await res.json().catch((e) => {
-            console.error("[/produtos] Falha a parsear JSON:", e);
-            return null;
-        });
-        console.log("[/produtos] JSON bruto recebido:", Array.isArray(json) ? `array(${json.length})` : typeof json);
+    const rows = await prisma.product.findMany({
+        where: { ativo: true },
+        orderBy: [{ categoria: "asc" }, { nome: "asc" }],
+        select: { id: true, nome: true, categoria: true, descricao: true },
+    });
 
-        const arr: ProdutoAPI[] = Array.isArray(json) ? json : json?.data ?? [];
-        console.log("[/produtos] Array normalizado:", `array(${arr.length})`);
-        if (arr.length > 0) {
-            console.log("[/produtos] Exemplo 1º item:", arr[0]);
-        }
-
-        const mapped = arr.map((p) => ({
-            id: p.id,
-            nome: p.nome,
-            categoria: p.categoria,
-            descricao: p.descricao ?? "",
-        }));
-
-        console.log("[/produtos] Mapeado para Produto:", `array(${mapped.length})`);
-        return mapped;
-    } catch (err) {
-        console.error("[/produtos] Falha no fetch /api/produtos:", err);
-        return [];
-    }
+    return rows.map((r) => ({
+        id: r.id,
+        nome: r.nome,
+        categoria: r.categoria as Categoria,
+        descricao: r.descricao ?? "",
+    }));
 }
 
 // Next 15 → searchParams é Promise
 type PageProps = { searchParams: Promise<{ cat?: Categoria; q?: string }> };
 
 export default async function ProdutosPage(props: PageProps) {
-    console.log("[/produtos] Render iniciado");
     const searchParams = await props.searchParams;
-    console.log("[/produtos] searchParams:", searchParams);
-
     const cat = (searchParams?.cat as Categoria | undefined) ?? undefined;
     const q = (searchParams?.q ?? "").trim().toLowerCase();
 
-    console.log("[/produtos] filtros -> cat:", cat, "| q:", q);
-
     const dataAll = await getProdutos();
-    console.log("[/produtos] Total produtos (antes do filtro):", dataAll.length);
 
     const data = dataAll.filter((p) => {
         const okCat = !cat || p.categoria === cat;
         const okQ = !q || p.nome.toLowerCase().includes(q) || p.descricao.toLowerCase().includes(q);
-        const keep = okCat && okQ;
-        if (q && keep) {
-            console.log("[/produtos] match:", { id: p.id, nome: p.nome, categoria: p.categoria });
-        }
-        return keep;
+        return okCat && okQ;
     });
-
-    console.log("[/produtos] Total após filtro:", data.length);
 
     const tabs: { key?: Categoria; label: string }[] = [
         { label: "Todos" },
@@ -137,8 +89,6 @@ export default async function ProdutosPage(props: PageProps) {
 
     const waHref = `https://wa.me/351${WHATS}`;
     const telHref = `tel:${PHONE}`;
-    console.log("[/produtos] waHref:", waHref);
-    console.log("[/produtos] telHref:", telHref);
 
     return (
         <div className="max-w-6xl mx-auto px-4 py-8 space-y-8">
@@ -165,35 +115,32 @@ export default async function ProdutosPage(props: PageProps) {
                 </div>
             ) : (
                 <section className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-                    {data.map((p) => {
-                        console.log("[/produtos] render card:", { id: p.id, nome: p.nome, categoria: p.categoria });
-                        return (
-                            <article
-                                key={p.id}
-                                className="group rounded-2xl border ring-1 shadow-sm bg-white overflow-hidden hover:shadow-md transition"
-                            >
-                                {/* Header decorativo por categoria */}
-                                <div className={["relative h-28 bg-gradient-to-br", colors[p.categoria]].join(" ")}>
-                                    <svg className="absolute inset-0 h-full w-full opacity-15 mix-blend-overlay" aria-hidden="true">
-                                        <defs>
-                                            <pattern id={`dots-${p.id}`} width="16" height="16" patternUnits="userSpaceOnUse">
-                                                <circle cx="1" cy="1" r="1"></circle>
-                                            </pattern>
-                                        </defs>
-                                        <rect width="100%" height="100%" fill={`url(#dots-${p.id})`} />
-                                    </svg>
-                                    <div className="absolute -right-2 -bottom-2 opacity-20 scale-150">{icons[p.categoria]}</div>
-                                </div>
+                    {data.map((p) => (
+                        <article
+                            key={p.id}
+                            className="group rounded-2xl border ring-1 shadow-sm bg-white overflow-hidden hover:shadow-md transition"
+                        >
+                            {/* Header decorativo por categoria */}
+                            <div className={["relative h-28 bg-gradient-to-br", colors[p.categoria]].join(" ")}>
+                                <svg className="absolute inset-0 h-full w-full opacity-15 mix-blend-overlay" aria-hidden="true">
+                                    <defs>
+                                        <pattern id={`dots-${p.id}`} width="16" height="16" patternUnits="userSpaceOnUse">
+                                            <circle cx="1" cy="1" r="1"></circle>
+                                        </pattern>
+                                    </defs>
+                                    <rect width="100%" height="100%" fill={`url(#dots-${p.id})`} />
+                                </svg>
+                                <div className="absolute -right-2 -bottom-2 opacity-20 scale-150">{icons[p.categoria]}</div>
+                            </div>
 
-                                {/* Corpo */}
-                                <div className="px-5 pb-5 pt-4">
-                                    <div className="text-xs uppercase tracking-wide text-gray-600 mb-1">{labels[p.categoria]}</div>
-                                    <h3 className="font-semibold text-gray-900">{p.nome}</h3>
-                                    {p.descricao ? <p className="text-sm text-gray-600 mt-1 line-clamp-3">{p.descricao}</p> : null}
-                                </div>
-                            </article>
-                        );
-                    })}
+                            {/* Corpo */}
+                            <div className="px-5 pb-5 pt-4">
+                                <div className="text-xs uppercase tracking-wide text-gray-600 mb-1">{labels[p.categoria]}</div>
+                                <h3 className="font-semibold text-gray-900">{p.nome}</h3>
+                                {p.descricao ? <p className="text-sm text-gray-600 mt-1 line-clamp-3">{p.descricao}</p> : null}
+                            </div>
+                        </article>
+                    ))}
                 </section>
             )}
 
