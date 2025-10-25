@@ -1,5 +1,3 @@
-"use client";
-
 import Image from "next/image";
 import BackButton from "@/components/BackButton";
 import RelatedPages from "@/components/RelatedPages";
@@ -62,8 +60,6 @@ export default function ContactosPage() {
                     fill
                     priority
                     className="object-cover"
-                    onLoad={() => console.log("🖼[/contactos] HERO image carregada com sucesso.")}
-                    onError={(e) => console.error("[/contactos] Falha ao carregar HERO image:", e)}
                 />
             </section>
 
@@ -88,7 +84,6 @@ export default function ContactosPage() {
 
                         <a
                             href={telHref}
-                            onClick={() => console.log("[/contactos] Link telefone clicado:", telHref)}
                             className="mt-4 inline-flex items-center gap-3 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-2 font-semibold text-emerald-700 hover:bg-emerald-100 transition-colors"
                         >
                             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -109,7 +104,6 @@ export default function ContactosPage() {
                         <p className="mt-1 text-sm text-gray-500">Responderemos com a maior brevidade.</p>
                         <a
                             href={mailHref}
-                            onClick={() => console.log("[/contactos] Link email clicado:", mailHref)}
                             className="mt-4 inline-flex items-center gap-3 rounded-xl border border-cyan-200 bg-cyan-50 px-4 py-2 font-semibold text-cyan-700 hover:bg-cyan-100 transition-colors break-all"
                         >
                             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
