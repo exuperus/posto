@@ -96,11 +96,14 @@ function Sparkline({
     now?: number;
     stroke: string;
 }) {
-    if (!Number.isFinite(prev) || !Number.isFinite(now))
+    if (!Number.isFinite(prev) || !Number.isFinite(now)) {
+        console.log("[Sparkline] valores inválidos -> prev:", prev, "now:", now);
         return <div className="h-8" aria-hidden />;
+    }
     const base = Math.max(prev as number, now as number) || 1;
     const yPrev = 24 - ((prev as number) / base) * 24;
     const yNow = 24 - ((now as number) / base) * 24;
+    console.log("[Sparkline] base:", base, "yPrev:", yPrev, "yNow:", yNow);
     return (
         <svg viewBox="0 0 100 24" className="h-8 w-full" role="img">
             <polyline
@@ -118,22 +121,39 @@ function Sparkline({
    PÁGINA PRINCIPAL
    ======================= */
 export default async function CombustiveisPage() {
+    console.log("[/combustiveis] Render iniciado. NODE_ENV:", process.env.NODE_ENV, "VERCEL:", !!process.env.VERCEL);
+
     // fetch RELATIVO para funcionar no build e em runtime no Vercel
     let all: FuelRow[] = [];
     try {
+        console.log("[/combustiveis] A chamar GET /api/combustiveis ...");
         const res = await fetch(`/api/combustiveis`, { cache: "no-store" });
-        if (res.ok) all = await res.json();
-    } catch {
+        console.log("[/combustiveis] Resposta API status:", res.status, res.statusText);
+        if (res.ok) {
+            all = await res.json();
+            console.log(" [/combustiveis] JSON recebido. Registos:", Array.isArray(all) ? all.length : "não é array");
+            if (Array.isArray(all) && all.length > 0) {
+                console.log("[/combustiveis] Exemplo 1º registo:", all[0]);
+            }
+        } else {
+            console.warn("⚠[/combustiveis] Resposta não OK de /api/combustiveis");
+        }
+    } catch (err) {
+        console.error("[/combustiveis] Falha no fetch /api/combustiveis:", err);
         all = []; // se a API falhar, renderizamos UI vazia (sem crash)
     }
 
     const pick = (keys: string[]) =>
         all.find((f) => {
-            const name = norm((f.nome || f.tipo || "").replace(/_/g, " "));
-            return keys.some((k) => name.includes(k));
+            const raw = (f.nome || f.tipo || "");
+            const name = norm(raw.replace(/_/g, " "));
+            const hit = keys.some((k) => name.includes(k));
+            console.log("🔎 [/combustiveis] pick() raw:", raw, "norm:", name, "keys:", keys, "→ hit:", hit);
+            return hit;
         });
 
-    const items = TARGETS.map((t) => {
+    console.log("[/combustiveis] A construir items a partir de TARGETS...");
+    const items = TARGETS.map((t, idx) => {
         const row = pick(t.keys.map(norm));
         const price =
             toNum(row?.preco_atual) ??
@@ -152,6 +172,20 @@ export default async function CombustiveisPage() {
                 ? (delta as number) / (prev as number)
                 : undefined;
 
+        const updated = row?.updatedAt ?? row?.vigencia_inicio ?? row?.data;
+
+        const debugRow = {
+            label: t.label,
+            tone: t.tone,
+            price,
+            prev,
+            delta,
+            pct,
+            updated,
+            matchedRow: row ?? null,
+        };
+        console.log(`   ↪[/combustiveis] item #${idx + 1}:`, debugRow);
+
         return {
             label: t.label,
             tone: t.tone,
@@ -159,7 +193,7 @@ export default async function CombustiveisPage() {
             prev,
             delta,
             pct,
-            updated: row?.updatedAt ?? row?.vigencia_inicio ?? row?.data,
+            updated,
         };
     });
 
@@ -169,8 +203,11 @@ export default async function CombustiveisPage() {
         .sort()
         .reverse()[0];
 
+    console.log("[/combustiveis] updatedAt calculado:", updatedAt);
     const friday = isFriday();
+    console.log("[/combustiveis] é sexta-feira?:", friday, "desconto:", FRIDAY_DISCOUNT_EUR, "exceto:", FRIDAY_EXCEPT);
 
+    console.log("[/combustiveis] A renderizar", items.length, "cards.");
     return (
         <div className="space-y-6">
             {/* ===== CABEÇALHO ===== */}
@@ -233,6 +270,18 @@ export default async function CombustiveisPage() {
                                     : "lime";
                     const stroke = down ? "#ef4444" : up ? "#059669" : "#6b7280";
 
+                    console.log("[/combustiveis] card:", {
+                        label: it.label,
+                        price: it.price,
+                        prev: it.prev,
+                        delta: it.delta,
+                        pct: it.pct,
+                        up,
+                        down,
+                        tone,
+                        stroke,
+                    });
+
                     return (
                         <article
                             key={it.label}
@@ -241,26 +290,26 @@ export default async function CombustiveisPage() {
                             <div className="p-5">
                                 <header className="flex items-center justify-between">
                                     <div className="flex items-center gap-2">
-                    <span
-                        className={[
-                            "inline-flex h-9 w-9 items-center justify-center rounded-xl ring-1 ring-inset",
-                            tone === "emerald" && "bg-emerald-50 ring-emerald-100",
-                            tone === "cyan" && "bg-cyan-50 ring-cyan-100",
-                            tone === "orange" && "bg-orange-50 ring-orange-100",
-                            tone === "lime" && "bg-lime-50 ring-lime-100",
-                        ]
-                            .filter(Boolean)
-                            .join(" ")}
-                    >
-                      <Fuel className="h-5 w-5 text-ink/70" />
-                    </span>
+                                        <span
+                                            className={[
+                                                "inline-flex h-9 w-9 items-center justify-center rounded-xl ring-1 ring-inset",
+                                                tone === "emerald" && "bg-emerald-50 ring-emerald-100",
+                                                tone === "cyan" && "bg-cyan-50 ring-cyan-100",
+                                                tone === "orange" && "bg-orange-50 ring-orange-100",
+                                                tone === "lime" && "bg-lime-50 ring-lime-100",
+                                            ]
+                                                .filter(Boolean)
+                                                .join(" ")}
+                                        >
+                                            <Fuel className="h-5 w-5 text-ink/70" />
+                                        </span>
                                         <h3 className="font-semibold text-ink">{it.label}</h3>
                                     </div>
 
                                     {it.delta === undefined ? (
                                         <span className="rounded-full bg-gray-100 px-2 py-1 text-xs text-gray-600">
-                      s/ variação
-                    </span>
+                                            s/ variação
+                                        </span>
                                     ) : (
                                         <span
                                             className={[
@@ -272,16 +321,16 @@ export default async function CombustiveisPage() {
                                                 .filter(Boolean)
                                                 .join(" ")}
                                         >
-                      {down ? (
-                          <TrendingDown className="h-3.5 w-3.5" />
-                      ) : up ? (
-                          <TrendingUp className="h-3.5 w-3.5" />
-                      ) : null}
+                                            {down ? (
+                                                <TrendingDown className="h-3.5 w-3.5" />
+                                            ) : up ? (
+                                                <TrendingUp className="h-3.5 w-3.5" />
+                                            ) : null}
                                             {nf.format(Math.abs(it.delta ?? 0))} €
                                             {it.pct !== undefined && (
                                                 <span className="opacity-70">({pf.format(Math.abs(it.pct))})</span>
                                             )}
-                    </span>
+                                        </span>
                                     )}
                                 </header>
 

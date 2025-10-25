@@ -1,44 +1,75 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
 
 type Props = { isHome?: boolean };
 
 export default function Footer({ isHome }: Props) {
-    // URL por defeito: Sendim (Miranda do Douro)
+    console.log("[Footer] Módulo carregado no cliente. isHome =", isHome);
+
+    // URL por defeito (fallback)
     const DEFAULT_MAPS =
-        'https://www.google.com/maps?q=Sendim%2C%20Miranda%20do%20Douro';
+        "https://www.google.com/maps?q=Sendim%2C%20Miranda%20do%20Douro";
+    console.log("[Footer] URL padrão (DEFAULT_MAPS):", DEFAULT_MAPS);
 
     const [mapsUrl, setMapsUrl] = useState<string>(DEFAULT_MAPS);
-
-    // Evita hydration mismatch: só renderiza depois de montar no cliente
     const [mounted, setMounted] = useState(false);
-    useEffect(() => setMounted(true), []);
 
+    // Primeira montagem (hidratação)
     useEffect(() => {
-        // Só faz fetch depois de montar
-        if (!mounted) return;
+        console.log("[Footer] useEffect #1 → Componente montado no cliente.");
+        setMounted(true);
+    }, []);
 
-        fetch('/api/station', { cache: 'no-store' })
-            .then((r) => (r.ok ? r.json() : null))
+    // Fetch do /api/station apenas após montagem
+    useEffect(() => {
+        if (!mounted) {
+            console.log("[Footer] Ainda não montado — fetch ignorado.");
+            return;
+        }
+
+        console.log("[Footer] A fazer fetch para /api/station...");
+
+        fetch("/api/station", { cache: "no-store" })
+            .then((r) => {
+                console.log("[Footer] Resposta HTTP:", r.status, r.statusText);
+                return r.ok ? r.json() : null;
+            })
             .then((s) => {
-                if (!s) return;
+                if (!s) {
+                    console.warn("[Footer] Nenhuma estação devolvida da API.");
+                    return;
+                }
+
+                console.log("[Footer] Dados recebidos da API:", s);
+
                 try {
                     const links = s?.linksJson ? JSON.parse(s.linksJson) : {};
-                    if (typeof links?.maps_url === 'string' && links.maps_url.length > 0) {
+                    console.log("[Footer] linksJson parseado:", links);
+
+                    if (typeof links?.maps_url === "string" && links.maps_url.length > 0) {
+                        console.log("[Footer] maps_url encontrado:", links.maps_url);
                         setMapsUrl(links.maps_url);
+                    } else {
+                        console.warn("[Footer] Nenhum maps_url válido encontrado no JSON.");
                     }
-                } catch {
-                    /* ignore */
+                } catch (err) {
+                    console.error("[Footer] Erro ao fazer parse de linksJson:", err);
                 }
             })
-            .catch(() => {});
+            .catch((err) => console.error("[Footer] Erro no fetch:", err));
     }, [mounted]);
 
-    // enquanto não estiver montado, não renderiza nada
-    if (!mounted) return null;
+    // Renderização
+    if (!mounted) {
+        console.log("[Footer] Não renderizado (ainda não montado).");
+        return null;
+    }
+
+    console.log("[Footer] Renderização iniciada. mapsUrl =", mapsUrl);
 
     if (isHome) {
+        console.log("[Footer] Renderização do footer da homepage (flutuante).");
         return (
             <footer className="fixed inset-x-0 bottom-0 z-30">
                 <div className="max-w-6xl px-6 py-4 flex justify-start">
@@ -47,8 +78,9 @@ export default function Footer({ isHome }: Props) {
                         target="_blank"
                         rel="noopener noreferrer"
                         className="inline-flex items-center rounded-full border border-white/70
-                       text-white/90 backdrop-blur-sm bg-black/20 px-4 py-2 text-sm
-                       hover:bg-white/20 transition"
+                           text-white/90 backdrop-blur-sm bg-black/20 px-4 py-2 text-sm
+                           hover:bg-white/20 transition"
+                        onClick={() => console.log("[Footer] Link clicado:", mapsUrl)}
                     >
                         📍 Localização: Sendim
                     </a>
@@ -56,4 +88,7 @@ export default function Footer({ isHome }: Props) {
             </footer>
         );
     }
+
+    console.log("[Footer] Não é homepage — não renderiza footer fixo.");
+    return null;
 }

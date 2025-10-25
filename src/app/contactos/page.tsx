@@ -1,11 +1,38 @@
 import Image from "next/image";
 
+// ===== DEBUG DE AMBIENTE (avaliado no load do módulo)
 const PHONE = process.env.NEXT_PUBLIC_PHONE ?? "938452320";
 const EMAIL = process.env.NEXT_PUBLIC_EMAIL ?? "geralsandrinaemario@hotmail.com";
 
+console.log("[contactos] Ambiente carregado:");
+console.log("   - NODE_ENV:", process.env.NODE_ENV);
+console.log("   - VERCEL:", !!process.env.VERCEL);
+console.log("   - NEXT_PUBLIC_PHONE:", PHONE);
+console.log("   - NEXT_PUBLIC_EMAIL:", EMAIL);
+
 export const revalidate = 900;
+console.log("[contactos] revalidate:", revalidate);
 
 export default function ContactosPage() {
+    console.log("[/contactos] Render iniciado.");
+    console.log("[/contactos] PHONE (usado no href tel:):", PHONE);
+    console.log("[/contactos] EMAIL (usado no href mailto:):", EMAIL);
+
+    const telHref = `tel:${PHONE.replace(/\s+/g, "")}`;
+    const mailHref = `mailto:${EMAIL}`;
+
+    console.log("[/contactos] telHref:", telHref);
+    console.log("[/contactos] mailHref:", mailHref);
+
+    if (!process.env.NEXT_PUBLIC_PHONE) {
+        console.warn("[/contactos] NEXT_PUBLIC_PHONE não definido. A usar fallback:", PHONE);
+    }
+    if (!process.env.NEXT_PUBLIC_EMAIL) {
+        console.warn("[/contactos] NEXT_PUBLIC_EMAIL não definido. A usar fallback:", EMAIL);
+    }
+
+    console.log("[/contactos] A preparar HERO image '/contactos-hero.jpg'...");
+
     return (
         <div className="relative">
             {/* HERO */}
@@ -16,6 +43,8 @@ export default function ContactosPage() {
                     fill
                     priority
                     className="object-cover"
+                    onLoad={() => console.log("🖼[/contactos] HERO image carregada com sucesso.")}
+                    onError={(e) => console.error("[/contactos] Falha ao carregar HERO image:", e)}
                 />
             </section>
 
@@ -39,7 +68,8 @@ export default function ContactosPage() {
                         <p className="mt-1 text-sm text-gray-500">Dias úteis, 08h–22h</p>
 
                         <a
-                            href={`tel:${PHONE.replace(/\s+/g, "")}`}
+                            href={telHref}
+                            onClick={() => console.log("[/contactos] Link telefone clicado:", telHref)}
                             className="mt-4 inline-flex items-center gap-3 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-2 font-semibold text-emerald-700 hover:bg-emerald-100 transition-colors"
                         >
                             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -59,7 +89,8 @@ export default function ContactosPage() {
                         <h3 className="text-lg font-semibold text-ink">E-mail</h3>
                         <p className="mt-1 text-sm text-gray-500">Responderemos com a maior brevidade.</p>
                         <a
-                            href={`mailto:${EMAIL}`}
+                            href={mailHref}
+                            onClick={() => console.log("✉[/contactos] Link email clicado:", mailHref)}
                             className="mt-4 inline-flex items-center gap-3 rounded-xl border border-cyan-200 bg-cyan-50 px-4 py-2 font-semibold text-cyan-700 hover:bg-cyan-100 transition-colors break-all"
                         >
                             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">

@@ -6,9 +6,23 @@ import { Phone, Truck, Smile, Clock as ClockIcon } from "lucide-react";
 const PHONE: string = process.env.NEXT_PUBLIC_PHONE ?? "938452320"; // móvel
 const LANDLINE = "273739700"; // fixo
 
+console.log("[/transporte-domicilio] Módulo carregado.");
+console.log("   - NODE_ENV:", process.env.NODE_ENV);
+console.log("   - VERCEL:", !!process.env.VERCEL);
+console.log("   - NEXT_PUBLIC_PHONE:", PHONE);
+console.log("   - LANDLINE:", LANDLINE);
+
+
 export const revalidate = 900;
+console.log("[/transporte-domicilio] revalidate:", revalidate);
 
 export default function TransportePage() {
+    console.log("[/transporte-domicilio] Render iniciado.");
+    const phoneHref = `tel:${PHONE.replace(/\s+/g, "")}`;
+    const landlineHref = `tel:${LANDLINE}`;
+    console.log("[/transporte-domicilio] phoneHref:", phoneHref);
+    console.log("[/transporte-domicilio] landlineHref:", landlineHref); {
+    }
     return (
         <div className="max-w-6xl mx-auto px-4">
             {/* Imagem principal */}

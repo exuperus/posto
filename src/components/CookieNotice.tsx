@@ -1,28 +1,59 @@
-// src/components/CookieNotice.tsx
 "use client";
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
 
 const STORAGE_KEY = "cookie_notice_dismissed_v1";
+console.log("[CookieNotice] Módulo carregado no cliente.");
+console.log("   - STORAGE_KEY:", STORAGE_KEY);
 
 export default function CookieNotice() {
     const [visible, setVisible] = useState(false);
+    console.log("[CookieNotice] Componente montado (inicial). Estado visível:", visible);
 
     useEffect(() => {
-        // Só mostra se ainda não tiver sido escondido antes
-        const dismissed = typeof window !== "undefined" && localStorage.getItem(STORAGE_KEY) === "1";
-        if (!dismissed) setVisible(true);
+        console.log("⚙[CookieNotice] useEffect executado (verificar localStorage).");
+
+        try {
+            if (typeof window !== "undefined") {
+                const value = localStorage.getItem(STORAGE_KEY);
+                console.log("[CookieNotice] Valor atual em localStorage:", value);
+
+                const dismissed = value === "1";
+                console.log("[CookieNotice] dismissed =", dismissed);
+
+                if (!dismissed) {
+                    console.log("[CookieNotice] Aviso será exibido (setVisible(true)).");
+                    setVisible(true);
+                } else {
+                    console.log("[CookieNotice] Aviso já foi rejeitado anteriormente.");
+                }
+            } else {
+                console.warn("⚠[CookieNotice] window ainda não definido (SSR).");
+            }
+        } catch (err) {
+            console.error("[CookieNotice] Erro ao aceder ao localStorage:", err);
+        }
     }, []);
 
     const dismiss = () => {
+        console.log("[CookieNotice] Botão 'Ok, percebi' clicado.");
         try {
             localStorage.setItem(STORAGE_KEY, "1");
-        } catch {}
+            console.log("[CookieNotice] STORAGE_KEY gravado como '1' no localStorage.");
+        } catch (err) {
+            console.error("[CookieNotice] Falha ao gravar no localStorage:", err);
+        }
         setVisible(false);
+        console.log("[CookieNotice] Aviso ocultado (setVisible(false)).");
     };
 
-    if (!visible) return null;
+    if (!visible) {
+        console.log("[CookieNotice] Não visível — não será renderizado.");
+        return null;
+    }
+
+    console.log("[CookieNotice] A renderizar aviso de cookies...");
 
     return (
         <div
@@ -38,14 +69,15 @@ export default function CookieNotice() {
                         <Link
                             href="/politica-privacidade#cookies"
                             className="text-emerald-700 font-medium hover:underline"
+                            onClick={() =>
+                                console.log("[CookieNotice] Link para política de privacidade clicado.")
+                            }
                         >
                             Política de Privacidade
                         </Link>.
                     </p>
 
                     <div className="flex gap-2 sm:shrink-0">
-                        {/* Se no futuro adicionares analíticas/cookies opcionais,
-                poderás trocar por dois botões: "Rejeitar" / "Aceitar" */}
                         <button
                             type="button"
                             onClick={dismiss}

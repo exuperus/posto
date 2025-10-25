@@ -1,9 +1,8 @@
-// prisma/seed.cjs
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
 async function main() {
-    console.log('🛠️  A semear dados iniciais...');
+    console.log('A semear dados iniciais...');
 
     // Estação exemplo (safe)
     await prisma.station.upsert({
@@ -73,9 +72,9 @@ async function main() {
         ],
     });
 
-    console.log('✅ Dados iniciais criados com sucesso!');
+    console.log('Dados iniciais criados com sucesso!');
 }
 
 main()
-    .catch((e) => { console.error('❌ Erro ao executar seed:', e); process.exit(1); })
+    .catch((e) => { console.error('Erro ao executar seed:', e); process.exit(1); })
     .finally(async () => { await prisma.$disconnect(); });

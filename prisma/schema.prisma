@@ -1,12 +1,11 @@
-// prisma/schema.prisma
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
   provider  = "postgresql"
-  url       = env("DATABASE_URL")  // pooled (Vercel)
-  directUrl = env("DIRECT_URL")    // ligação direta (migrations)
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 /* ---------- ENUMS ---------- */
@@ -40,7 +39,7 @@ model Station {
   horario_semana     String?
   horario_fim_semana String?
   feriados_especiais String?
-  servicosJson       String?   // JSON serializado
+  servicosJson       String?
   linksJson          String?
   logoUrl            String?
   heroUrl            String?
@@ -51,7 +50,7 @@ model Station {
 model Fuel {
   id              Int       @id @default(autoincrement())
   tipo            FuelType
-  // Postgres: precisão fixa (10,3) — ex.: 1.603 €/L
+
   preco_atual     Decimal   @db.Decimal(10, 3)
   vigencia_inicio DateTime
   preco_anterior  Decimal?  @db.Decimal(10, 3)
@@ -67,7 +66,7 @@ model Product {
   id          Int       @id @default(autoincrement())
   nome        String
   categoria   Category
-  // usa cêntimos para evitar issues de arredondamentos
+
   precoCents  Int?      // null => "Sob consulta"
   descricao   String?   @default("")
   imagemUrl   String?
@@ -77,5 +76,5 @@ model Product {
 
   @@index([categoria, nome])
   @@index([ativo, categoria])
-  // @@unique([nome]) // ativa se quiseres forçar nomes únicos
+
 }

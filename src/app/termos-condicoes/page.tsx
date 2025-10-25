@@ -7,12 +7,32 @@ export const metadata: Metadata = {
         "Informações legais, termos de utilização, variação de preços e condições de acesso ao website.",
 };
 
+// ===== DEBUG DE MÓDULO =====
+console.log("[/termos-condicoes] Módulo carregado.");
+console.log("   - NODE_ENV:", process.env.NODE_ENV);
+console.log("   - VERCEL:", !!process.env.VERCEL);
+console.log("   - metadata.title:", metadata.title);
+console.log("   - metadata.description:", metadata.description);
+
 const COMPANY_NAME = "Sandrina & Mário, LDA";
 const COMPANY_ADDR = "Estrada Nacional 221, 5225-131 Sendim";
 const COMPANY_EMAIL = "geralsandrinaemario@hotmail.com";
 const COMPANY_PHONE = "273 739 700";
 
+console.log("[/termos-condicoes] Constantes:");
+console.log("   - COMPANY_NAME:", COMPANY_NAME);
+console.log("   - COMPANY_ADDR:", COMPANY_ADDR);
+console.log("   - COMPANY_EMAIL:", COMPANY_EMAIL);
+console.log("   - COMPANY_PHONE:", COMPANY_PHONE);
+
 export default function TermosCondicoesPage() {
+    console.log("[/termos-condicoes] Render iniciado.");
+    const today = new Date().toLocaleDateString("pt-PT");
+    console.log("[/termos-condicoes] Data de atualização:", today);
+
+    const mailHref = `mailto:${COMPANY_EMAIL}`;
+    console.log("[/termos-condicoes] mailHref:", mailHref);
+
     return (
         <main className="mx-auto max-w-4xl px-6 py-12 space-y-10">
             <header className="text-center space-y-2">
@@ -31,16 +51,15 @@ export default function TermosCondicoesPage() {
             <section className="space-y-3">
                 <h2 className="text-xl font-semibold">1. Identificação do prestador</h2>
                 <ul className="list-none pl-0 text-gray-700">
-                    <li>
-                        <strong>{COMPANY_NAME}</strong>
-                    </li>
+                    <li><strong>{COMPANY_NAME}</strong></li>
                     <li>{COMPANY_ADDR}</li>
                     <li>Telefone: {COMPANY_PHONE}</li>
                     <li>
                         E-mail:{" "}
                         <a
-                            href={`mailto:${COMPANY_EMAIL}`}
+                            href={mailHref}
                             className="text-emerald-700 font-medium hover:underline"
+                            onClick={() => console.log("[/termos-condicoes] click mailto:", mailHref)}
                         >
                             {COMPANY_EMAIL}
                         </a>
@@ -65,9 +84,7 @@ export default function TermosCondicoesPage() {
 
             {/* 3. Informação e preços */}
             <section className="space-y-3">
-                <h2 className="text-xl font-semibold">
-                    3. Informação, preços e promoções
-                </h2>
+                <h2 className="text-xl font-semibold">3. Informação, preços e promoções</h2>
                 <p className="text-gray-700">
                     Os preços de combustíveis apresentados no website são meramente
                     informativos e refletem os valores praticados no posto{" "}
@@ -98,8 +115,8 @@ export default function TermosCondicoesPage() {
                     autor e propriedade industrial.
                 </p>
                 <p className="text-gray-700">
-                    É proibida a reprodução, modificação ou distribuição, total ou
-                    parcial, de qualquer conteúdo sem consentimento prévio escrito.
+                    É proibida a reprodução, modificação ou distribuição, total ou parcial,
+                    de qualquer conteúdo sem consentimento prévio escrito.
                 </p>
             </section>
 
@@ -153,14 +170,14 @@ export default function TermosCondicoesPage() {
                 <h2 className="text-xl font-semibold">9. Lei aplicável e foro</h2>
                 <p className="text-gray-700">
                     Estes Termos regem-se pela legislação portuguesa. Em caso de litígio,
-                    é competente o foro da comarca de <strong>Porto</strong>, com
-                    exclusão de qualquer outro.
+                    é competente o foro da comarca de <strong>Porto</strong>, com exclusão
+                    de qualquer outro.
                 </p>
             </section>
 
             <footer className="pt-6 border-t border-gray-200">
                 <p className="text-sm text-gray-500">
-                    Última atualização: {new Date().toLocaleDateString("pt-PT")}
+                    Última atualização: {today}
                 </p>
             </footer>
         </main>
