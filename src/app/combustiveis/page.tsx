@@ -4,9 +4,31 @@ import type { FuelType } from "@prisma/client";
 import BackButton from "@/components/BackButton";
 import RelatedPages from "@/components/RelatedPages";
 import FridayBanner from "@/components/FridayBanner";
+import FuelCalculator from "@/components/FuelCalculator";
+import type { Metadata } from "next";
 
 export const dynamic = "force-dynamic"; // força o runtime dinâmico
 export const revalidate = 0;            // desativa cache ISR
+
+export const metadata: Metadata = {
+    title: "Preços Combustível - Sandrina & Mário, LDA | Sendim",
+    description: "Consulte os preços atuais de combustível: gasóleo, gasolina 95, gasóleo hi-energy e gasóleo agrícola. Promoção de sexta-feira com desconto especial.",
+    keywords: "combustível, gasóleo, gasolina, preços, Sendim, Miranda do Douro, posto abastecimento, desconto sexta-feira",
+    openGraph: {
+        title: "Preços Combustível - Sandrina & Mário, LDA",
+        description: "Preços atualizados de combustível com promoção de sexta-feira",
+        type: "website",
+        locale: "pt_PT",
+    },
+    twitter: {
+        card: "summary_large_image",
+        title: "Preços Combustível - Sandrina & Mário, LDA",
+        description: "Preços atualizados de combustível com promoção de sexta-feira",
+    },
+    alternates: {
+        canonical: "/combustiveis",
+    },
+};
 
 /* =======================
    FUNÇÕES DE UTILIDADE
@@ -264,6 +286,11 @@ export default async function CombustiveisPage() {
                     </div>
                 )}
             </header>
+
+            {/* ===== CALCULADORA ===== */}
+            <section className="mb-8">
+                <FuelCalculator />
+            </section>
 
             {/* ===== CARTÕES ===== */}
             <section

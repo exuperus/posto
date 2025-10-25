@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { Fuel, Package, Truck, Phone, MessageCircle } from "lucide-react";
+import AnimatedCard from "./AnimatedCard";
 
 export default function QuickActions() {
     const PHONE = process.env.NEXT_PUBLIC_PHONE ?? "938452320";
@@ -59,16 +60,17 @@ export default function QuickActions() {
                 {/* Grid de ações */}
                 <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
                     {actions.map((action, index) => (
-                        <Link
-                            key={action.href}
-                            href={action.href}
-                            className={`
-                                group relative overflow-hidden rounded-2xl
-                                bg-gradient-to-br ${action.color} ${action.hoverColor}
-                                p-6 text-white shadow-lg hover:shadow-xl
-                                transition-all duration-300 transform hover:-translate-y-1
-                            `}
-                        >
+                        <AnimatedCard key={action.href} delay={index * 0.1}>
+                            <Link
+                                href={action.href}
+                                className={`
+                                    group relative overflow-hidden rounded-2xl
+                                    bg-gradient-to-br ${action.color} ${action.hoverColor}
+                                    p-6 text-white shadow-lg hover:shadow-xl
+                                    transition-all duration-300 transform hover:-translate-y-1
+                                    block
+                                `}
+                            >
                             {/* Ícone */}
                             <div className="mb-4 opacity-90 group-hover:opacity-100 transition-opacity">
                                 {action.icon}
@@ -86,7 +88,8 @@ export default function QuickActions() {
 
                             {/* Efeito de hover */}
                             <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                        </Link>
+                            </Link>
+                        </AnimatedCard>
                     ))}
                 </div>
 

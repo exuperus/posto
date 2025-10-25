@@ -8,8 +8,24 @@ import ContactBar from "@/components/produtos/ContactBar";
 import { prisma } from "@/lib/prisma"; // ✅ lê direto do Prisma (sem fetch)
 import BackButton from "@/components/BackButton";
 import RelatedPages from "@/components/RelatedPages";
+import type { Metadata } from "next";
 
 export const revalidate = 300;
+
+export const metadata: Metadata = {
+    title: "Catálogo Produtos - Sandrina & Mário, LDA | Lubrificantes e Acessórios",
+    description: "Catálogo completo de produtos: lubrificantes, aditivos, produtos de lavagem e acessórios para automóveis. Encomendas e aconselhamento disponível.",
+    keywords: "lubrificantes, aditivos, produtos lavagem, acessórios automóvel, óleo motor, Sendim, Miranda do Douro",
+    openGraph: {
+        title: "Catálogo Produtos - Sandrina & Mário, LDA",
+        description: "Catálogo completo de produtos para automóveis com aconselhamento especializado",
+        type: "website",
+        locale: "pt_PT",
+    },
+    alternates: {
+        canonical: "/produtos",
+    },
+};
 
 // DEBUG
 const PHONE = process.env.NEXT_PUBLIC_PHONE ?? "938452320";

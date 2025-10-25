@@ -3,6 +3,22 @@
 import Image from "next/image";
 import BackButton from "@/components/BackButton";
 import RelatedPages from "@/components/RelatedPages";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+    title: "Contactos - Sandrina & Mário, LDA | Posto de Combustível Sendim",
+    description: "Contacte-nos para informações sobre combustíveis, produtos e serviços. Telefone, email e localização em Sendim, Miranda do Douro.",
+    keywords: "contactos, telefone, email, Sendim, Miranda do Douro, posto combustível, Sandrina Mário",
+    openGraph: {
+        title: "Contactos - Sandrina & Mário, LDA",
+        description: "Contacte-nos para informações sobre combustíveis e serviços",
+        type: "website",
+        locale: "pt_PT",
+    },
+    alternates: {
+        canonical: "/contactos",
+    },
+};
 
 // ===== DEBUG DE AMBIENTE (avaliado no load do módulo)
 const PHONE = process.env.NEXT_PUBLIC_PHONE ?? "938452320";

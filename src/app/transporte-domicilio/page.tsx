@@ -4,6 +4,22 @@ import Link from "next/link";
 import { Phone, Truck, Smile, Clock as ClockIcon } from "lucide-react";
 import BackButton from "@/components/BackButton";
 import RelatedPages from "@/components/RelatedPages";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+    title: "Transporte Combustível ao Domicílio - Sandrina & Mário, LDA | Sendim",
+    description: "Serviço de transporte de combustível ao domicílio. Entrega gratuita e rápida. Contacte-nos para marcar a sua entrega.",
+    keywords: "transporte combustível, entrega domicílio, combustível casa, Sendim, Miranda do Douro, entrega gratuita",
+    openGraph: {
+        title: "Transporte Combustível ao Domicílio - Sandrina & Mário, LDA",
+        description: "Serviço de entrega de combustível ao domicílio com entrega gratuita",
+        type: "website",
+        locale: "pt_PT",
+    },
+    alternates: {
+        canonical: "/transporte-domicilio",
+    },
+};
 
 const PHONE: string = process.env.NEXT_PUBLIC_PHONE ?? "938452320"; // móvel
 const LANDLINE = "273739700"; // fixo
