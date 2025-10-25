@@ -1,18 +1,6 @@
-// src/app/termos-condicoes/page.tsx
-import type { Metadata } from "next";
+"use client";
 
-export const metadata: Metadata = {
-    title: "Termos & Condições — Sandrina & Mário, LDA",
-    description:
-        "Informações legais, termos de utilização, variação de preços e condições de acesso ao website.",
-};
 
-// ===== DEBUG DE MÓDULO =====
-console.log("[/termos-condicoes] Módulo carregado.");
-console.log("   - NODE_ENV:", process.env.NODE_ENV);
-console.log("   - VERCEL:", !!process.env.VERCEL);
-console.log("   - metadata.title:", metadata.title);
-console.log("   - metadata.description:", metadata.description);
 
 const COMPANY_NAME = "Sandrina & Mário, LDA";
 const COMPANY_ADDR = "Estrada Nacional 221, 5225-131 Sendim";
