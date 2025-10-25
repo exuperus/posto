@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import type { FuelType } from "@prisma/client";
 import BackButton from "@/components/BackButton";
 import RelatedPages from "@/components/RelatedPages";
+import FridayBanner from "@/components/FridayBanner";
 
 export const dynamic = "force-dynamic"; // força o runtime dinâmico
 export const revalidate = 0;            // desativa cache ISR
@@ -221,6 +222,7 @@ export default async function CombustiveisPage() {
     return (
         <div className="space-y-6">
             <BackButton />
+            <FridayBanner />
             {/* ===== CABEÇALHO ===== */}
             <header className="flex items-end justify-between gap-4">
                 <div className="space-y-2">
