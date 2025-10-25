@@ -1,7 +1,10 @@
 // src/app/produtos/page.tsx
 import Link from "next/link";
 import { JSX } from "react";
-import { Droplets, Beaker, Sparkles, Package, Phone, MessageCircle } from "lucide-react";
+import { Droplets, Beaker, Sparkles, Package } from "lucide-react";
+import TabsNav from "@/components/produtos/TabsNav";
+import SearchFormClient from "@/components/produtos/SearchFormClient";
+import ContactBar from "@/components/produtos/ContactBar";
 
 export const revalidate = 300;
 
@@ -132,7 +135,6 @@ export default async function ProdutosPage(props: PageProps) {
         { key: "OUTROS", label: labels.OUTROS },
     ];
 
-    // Links de contacto (CTA fixo)
     const waHref = `https://wa.me/351${WHATS}`;
     const telHref = `tel:${PHONE}`;
     console.log("[/produtos] waHref:", waHref);
@@ -148,48 +150,15 @@ export default async function ProdutosPage(props: PageProps) {
 
             {/* Tabs + Pesquisa */}
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                <nav className="flex flex-wrap gap-2">
-                    {tabs.map((t) => {
-                        const selected = (t.key ?? undefined) === cat || (!t.key && !cat);
-                        const href = t.key
-                            ? `/produtos?cat=${t.key}${q ? `&q=${encodeURIComponent(q)}` : ""}`
-                            : `/produtos${q ? `?q=${encodeURIComponent(q)}` : ""}`;
-                        return (
-                            <Link
-                                key={t.label}
-                                href={href}
-                                className={[
-                                    "px-3 py-1.5 rounded-full text-sm ring-1 transition",
-                                    selected ? "bg-green-600 text-white ring-green-600" : "bg-white text-gray-700 ring-gray-200 hover:bg-gray-50",
-                                ].join(" ")}
-                                onClick={() => console.log("[/produtos] Tab click:", { tab: t.label, href })}
-                            >
-                                {t.label}
-                            </Link>
-                        );
-                    })}
-                </nav>
-
-                <form method="GET" className="flex items-center gap-2" onSubmit={() => console.log("[/produtos] submit pesquisa:", { cat, q })}>
-                    {cat && <input type="hidden" name="cat" value={cat} />}
-                    <input
-                        name="q"
-                        placeholder="Procurar (ex.: escovas 550)"
-                        defaultValue={q}
-                        className="w-64 rounded-lg border px-3 py-2 text-sm ring-1 ring-gray-200 focus:ring-2 focus:ring-green-600 outline-none"
-                        aria-label="Pesquisar produtos"
-                    />
-                    <button className="rounded-lg bg-green-600 text-white text-sm font-semibold px-3 py-2 hover:bg-green-700" type="submit">
-                        Procurar
-                    </button>
-                </form>
+                <TabsNav tabs={tabs} cat={cat} q={q} />
+                <SearchFormClient cat={cat} q={q} />
             </div>
 
             {/* Lista */}
             {data.length === 0 ? (
                 <div className="rounded-xl border bg-white p-6 text-center text-gray-600">
                     Sem resultados {q ? <>para <span className="font-medium">“{q}”</span></> : null}.{" "}
-                    <Link href="/produtos" className="text-green-700 font-medium" onClick={() => console.log("↩[/produtos] Limpar filtros click")}>
+                    <Link href="/produtos" className="text-green-700 font-medium">
                         Limpar filtros
                     </Link>
                     .
@@ -229,33 +198,7 @@ export default async function ProdutosPage(props: PageProps) {
             )}
 
             {/* Barra fixa de contacto */}
-            <div className="fixed bottom-4 right-4 z-30 pointer-events-none">
-                <div className="pointer-events-auto">
-                    <div className="rounded-2xl bg-white/90 backdrop-blur ring-1 ring-gray-200 shadow-lg p-3 flex items-center gap-3">
-                        <div className="text-sm text-gray-700">Precisa de ajuda a escolher? Fale connosco.</div>
-                        <div className="flex gap-2">
-                            <a
-                                href={waHref}
-                                className="inline-flex items-center gap-2 rounded-lg ring-1 ring-green-600 px-3 py-2 text-sm font-semibold text-green-700 hover:bg-green-50"
-                                aria-label="Falar no WhatsApp"
-                                onClick={() => console.log("[/produtos] WhatsApp click:", waHref)}
-                            >
-                                <MessageCircle className="h-4 w-4" />
-                                WhatsApp
-                            </a>
-                            <a
-                                href={telHref}
-                                className="inline-flex items-center gap-2 rounded-lg bg-green-600 text-white px-3 py-2 text-sm font-semibold hover:bg-green-700"
-                                aria-label="Ligar"
-                                onClick={() => console.log("[/produtos] Ligar click:", telHref)}
-                            >
-                                <Phone className="h-4 w-4" />
-                                Ligar
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <ContactBar waHref={waHref} telHref={telHref} />
         </div>
     );
 }
