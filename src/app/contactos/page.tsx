@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import BackButton from "@/components/BackButton";
 
 // ===== DEBUG DE AMBIENTE (avaliado no load do módulo)
 const PHONE = process.env.NEXT_PUBLIC_PHONE ?? "938452320";
@@ -35,6 +36,7 @@ export default function ContactosPage() {
 
     return (
         <div className="relative">
+            <BackButton />
             {/* HERO */}
             <section className="relative h-[42vh] min-h-[320px] w-full overflow-hidden rounded-b-3xl">
                 <Image

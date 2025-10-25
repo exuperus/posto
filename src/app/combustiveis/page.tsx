@@ -1,6 +1,7 @@
 import { Fuel, TrendingUp, TrendingDown, TicketPercent } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import type { FuelType } from "@prisma/client";
+import BackButton from "@/components/BackButton";
 
 export const dynamic = "force-dynamic"; // força o runtime dinâmico
 export const revalidate = 0;            // desativa cache ISR
@@ -218,6 +219,7 @@ export default async function CombustiveisPage() {
     console.log("[/combustiveis] A renderizar", items.length, "cards.");
     return (
         <div className="space-y-6">
+            <BackButton />
             {/* ===== CABEÇALHO ===== */}
             <header className="flex items-end justify-between gap-4">
                 <div className="space-y-2">

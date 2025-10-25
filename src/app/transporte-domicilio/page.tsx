@@ -2,6 +2,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Phone, Truck, Smile, Clock as ClockIcon } from "lucide-react";
+import BackButton from "@/components/BackButton";
 
 const PHONE: string = process.env.NEXT_PUBLIC_PHONE ?? "938452320"; // móvel
 const LANDLINE = "273739700"; // fixo
@@ -25,6 +26,7 @@ export default function TransportePage() {
     }
     return (
         <div className="max-w-6xl mx-auto px-4">
+            <BackButton />
             {/* Imagem principal */}
             <div className="relative w-full h-[380px] sm:h-[420px] md:h-[460px] lg:h-[500px] rounded-2xl overflow-hidden bg-neutral-100 shadow-md">
                 <Image
