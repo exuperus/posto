@@ -5,17 +5,17 @@ import type { FuelType } from "@prisma/client";
 
 export const dynamic = "force-dynamic";
 
-// ===========================
-// VARIÁVEIS DE AMBIENTE
-// ===========================
-console.log("Ambiente carregado:");
-console.log("   - DATABASE_URL:", process.env.DATABASE_URL ?? "Não definida");
-console.log("   - NODE_ENV:", process.env.NODE_ENV);
-console.log("   - RUNTIME:", process.env.VERCEL ? "Vercel" : "Local");
+/* ============================================================
+   DEBUG DE AMBIENTE
+   ============================================================ */
+console.log("[Combustíveis] Ambiente carregado:");
+console.log("   • DATABASE_URL:", process.env.DATABASE_URL ?? "Não definida");
+console.log("   • NODE_ENV:", process.env.NODE_ENV);
+console.log("   • Execução:", process.env.VERCEL ? "Vercel (produção)" : "Local");
 
-// ===========================
-// Tipagem do DTO
-// ===========================
+/* ============================================================
+   Tipagem do DTO devolvido
+   ============================================================ */
 type FuelDTO = {
     tipo: FuelType;
     preco_atual: string | null;
@@ -24,14 +24,15 @@ type FuelDTO = {
     updatedAt: string | null;
 };
 
-// ===========================
-// Função principal (GET)
-// ===========================
+/* ============================================================
+   Handler principal (GET)
+   ============================================================ */
 export async function GET() {
-    console.log("[GET /api/combustiveis] Requisição recebida.");
+    console.log("\n[GET /api/combustiveis] → Requisição recebida.");
 
     try {
-        console.log("A iniciar query Prisma...");
+        console.log("📡 A consultar Prisma (tabela fuel)...");
+
         const rows = await prisma.fuel.findMany({
             where: { publicado: true },
             orderBy: { tipo: "asc" },
@@ -43,44 +44,54 @@ export async function GET() {
                 updatedAt: true,
             },
         });
-        console.log(`Query concluída. ${rows.length} registos encontrados.`);
-        console.log("Primeira linha (exemplo):", rows[0] ?? "Sem dados");
 
-        // ===========================
-        // Transformação dos dados
-        // ===========================
-        console.log("A mapear dados para FuelDTO...");
+        console.log(`Query concluída — ${rows.length} registos encontrados.`);
+        if (rows.length > 0) console.log("   Exemplo 1º registo:", rows[0]);
+        else console.warn("⚠Nenhum combustível publicado encontrado.");
+
+        /* ============================================================
+           🔄 Normalização e mapeamento dos dados
+           ============================================================ */
         const json: FuelDTO[] = rows.map((r, i) => {
-            const dto = {
+            const dto: FuelDTO = {
                 tipo: r.tipo,
-                preco_atual: r.preco_atual?.toString() ?? null,
-                preco_anterior: r.preco_anterior?.toString() ?? null,
-                vigencia_inicio: r.vigencia_inicio?.toISOString() ?? null,
-                updatedAt: r.updatedAt?.toISOString() ?? null,
+                preco_atual:
+                    r.preco_atual !== null && r.preco_atual !== undefined
+                        ? r.preco_atual.toString()
+                        : null,
+                preco_anterior:
+                    r.preco_anterior !== null && r.preco_anterior !== undefined
+                        ? r.preco_anterior.toString()
+                        : null,
+                vigencia_inicio: r.vigencia_inicio
+                    ? new Date(r.vigencia_inicio).toISOString()
+                    : null,
+                updatedAt: r.updatedAt ? new Date(r.updatedAt).toISOString() : null,
             };
-            console.log(`   ↪Linha ${i + 1}:`, dto);
+            console.log(`   ↪ Linha ${i + 1}:`, dto);
             return dto;
         });
 
-        console.log("Mapeamento completo. Total DTOs:", json.length);
+        console.log(`Mapeamento completo. Total DTOs: ${json.length}`);
 
-        // ===========================
-        // Resposta final
-        // ===========================
-        console.log("A devolver resposta JSON ao cliente...");
-        return NextResponse.json<FuelDTO[]>(json, {
+        /* ============================================================
+           📤 Resposta final
+           ============================================================ */
+        return NextResponse.json(json, {
             headers: { "Cache-Control": "no-store" },
+            status: 200,
         });
-
     } catch (e: unknown) {
-        // ===========================
-        // ERRO
-        // ===========================
+        /* ============================================================
+           Tratamento de erro
+           ============================================================ */
         const message =
-            e instanceof Error ? e.message : "Erro inesperado ao obter combustíveis";
+            e instanceof Error
+                ? e.message
+                : "Erro inesperado ao obter dados de combustíveis.";
 
-        console.error("[ERRO /api/combustiveis]:", e);
-        console.error("", e instanceof Error ? e.stack : "Sem stack trace");
+        console.error("[ERRO /api/combustiveis]:", message);
+        if (e instanceof Error) console.error(e.stack);
 
         return NextResponse.json({ error: message }, { status: 500 });
     } finally {
