@@ -45,13 +45,13 @@ export default function TransportePage() {
         <div className="max-w-6xl mx-auto px-4">
             <BackButton />
             {/* Imagem principal */}
-            <div className="relative w-full h-[40vh] sm:h-[50vh] min-h-[300px] max-h-[600px] rounded-2xl overflow-hidden bg-neutral-100 shadow-md">
+            <div className="relative w-full h-[50vh] sm:h-[60vh] min-h-[400px] max-h-[700px] rounded-2xl overflow-hidden bg-neutral-100 shadow-md">
                 <Image
                     src="/transporte-hero.jpg"
                     alt="Transporte ao domicílio"
                     fill
                     priority
-                    className="object-cover sm:object-contain"
+                    className="object-contain"
                 />
             </div>
 
