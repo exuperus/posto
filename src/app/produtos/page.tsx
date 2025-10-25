@@ -10,7 +10,7 @@ import { prisma } from "@/lib/prisma"; // ✅ lê direto do Prisma (sem fetch)
 export const revalidate = 300;
 
 // DEBUG
-const PHONE = process.env.NEXT_PUBLIC_PHONE ?? "911 111 111";
+const PHONE = process.env.NEXT_PUBLIC_PHONE ?? "938452320";
 const WHATS = (process.env.NEXT_PUBLIC_WHATS ?? PHONE).replace(/\s+/g, "");
 
 type Categoria = "LUBRIFICANTES" | "ADITIVOS" | "LAVAGEM" | "ACESSORIOS" | "OUTROS";

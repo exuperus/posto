@@ -9,7 +9,7 @@ export default function Footer({ isHome }: Props) {
 
     // URL por defeito (fallback)
     const DEFAULT_MAPS =
-        "https://www.google.com/maps?q=Sendim%2C%20Miranda%20do%20Douro";
+        "https://maps.app.goo.gl/ND21VPudiqpSRyVq8";
     console.log("[Footer] URL padrão (DEFAULT_MAPS):", DEFAULT_MAPS);
 
     const [mapsUrl, setMapsUrl] = useState<string>(DEFAULT_MAPS);
