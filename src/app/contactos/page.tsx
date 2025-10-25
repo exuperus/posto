@@ -2,7 +2,6 @@
 
 import Image from "next/image";
 import BackButton from "@/components/BackButton";
-import Breadcrumbs from "@/components/Breadcrumbs";
 import RelatedPages from "@/components/RelatedPages";
 
 // ===== DEBUG DE AMBIENTE (avaliado no load do módulo)
@@ -39,7 +38,6 @@ export default function ContactosPage() {
     return (
         <div className="relative">
             <BackButton />
-            <Breadcrumbs />
             {/* HERO */}
             <section className="relative h-[42vh] min-h-[320px] w-full overflow-hidden rounded-b-3xl">
                 <Image

@@ -7,7 +7,6 @@ import SearchFormClient from "@/components/produtos/SearchFormClient";
 import ContactBar from "@/components/produtos/ContactBar";
 import { prisma } from "@/lib/prisma"; // ✅ lê direto do Prisma (sem fetch)
 import BackButton from "@/components/BackButton";
-import Breadcrumbs from "@/components/Breadcrumbs";
 import RelatedPages from "@/components/RelatedPages";
 
 export const revalidate = 300;
@@ -96,7 +95,6 @@ export default async function ProdutosPage(props: PageProps) {
     return (
         <div className="max-w-6xl mx-auto px-4 py-8 space-y-8">
             <BackButton />
-            <Breadcrumbs />
             {/* Título */}
             <header className="text-center space-y-2">
                 <h1 className="text-3xl font-bold tracking-tight">Produtos</h1>
