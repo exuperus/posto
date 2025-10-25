@@ -137,7 +137,13 @@ export default async function CombustiveisPage() {
             },
         });
 
-        all = rows;
+        all = rows.map(row => ({
+            tipo: row.tipo,
+            preco_atual: row.preco_atual ? Number(row.preco_atual) : null,
+            preco_anterior: row.preco_anterior ? Number(row.preco_anterior) : null,
+            vigencia_inicio: row.vigencia_inicio,
+            updatedAt: row.updatedAt,
+        }));
         console.log(`[/combustiveis] Query concluída — ${rows.length} registos encontrados.`);
         if (rows.length > 0) {
             console.log("[/combustiveis] Exemplo 1º registo:", rows[0]);
