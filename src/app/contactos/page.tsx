@@ -53,13 +53,13 @@ export default function ContactosPage() {
         <div className="relative">
             <BackButton />
             {/* HERO */}
-            <section className="relative h-[40vh] sm:h-[50vh] min-h-[250px] max-h-[500px] w-full overflow-hidden rounded-b-3xl">
+            <section className="relative h-[40vh] sm:h-[70vh] min-h-[250px] max-h-[700px] w-full overflow-hidden rounded-b-3xl">
                 <Image
                     src="/contactos-hero.jpg"
                     alt="Contacte-nos"
                     fill
                     priority
-                    className="object-cover"
+                    className="object-cover sm:object-contain"
                 />
             </section>
 

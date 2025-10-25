@@ -8,14 +8,14 @@ export default function Hero({
     title?: string
 }) {
     return (
-        <section className="relative h-[60vh] sm:h-[80vh] min-h-[300px] max-h-[700px] w-full overflow-hidden">
+        <section className="relative h-[60vh] sm:h-[90vh] min-h-[300px] max-h-[800px] w-full overflow-hidden">
             {/* Imagem de fundo */}
             <Image
                 src="/hero.png"
                 alt={title}
                 fill
                 priority
-                className="object-cover sm:object-contain"
+                className="object-cover"
                 sizes="100vw"
             />
 
