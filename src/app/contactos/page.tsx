@@ -12,8 +12,6 @@ console.log("   - VERCEL:", !!process.env.VERCEL);
 console.log("   - NEXT_PUBLIC_PHONE:", PHONE);
 console.log("   - NEXT_PUBLIC_EMAIL:", EMAIL);
 
-export const revalidate = 900;
-console.log("[contactos] revalidate:", revalidate);
 
 export default function ContactosPage() {
     console.log("[/contactos] Render iniciado.");

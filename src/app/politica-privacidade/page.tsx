@@ -1,5 +1,6 @@
 // src/app/politica-privacidade/page.tsx
 import type { Metadata } from "next";
+import MailLink from "@/components/MailLink";
 
 export const metadata: Metadata = {
     title: "Política de Privacidade — Sandrina & Mário, LDA",
@@ -7,7 +8,7 @@ export const metadata: Metadata = {
         "Informação sobre tratamento de dados pessoais, cookies e direitos dos titulares (RGPD).",
 };
 
-// 🔍 DEBUG a nível de módulo (executa no load)
+// 🔍 DEBUG a nível de módulo (executa no load – lado do servidor)
 console.log("[/politica-privacidade] Módulo carregado.");
 console.log("   - NODE_ENV:", process.env.NODE_ENV);
 console.log("   - VERCEL:", !!process.env.VERCEL);
@@ -27,9 +28,6 @@ export default function PoliticaPrivacidadePage() {
     console.log("[/politica-privacidade] Render iniciado.");
     const today = new Date().toLocaleDateString("pt-PT");
     console.log("[/politica-privacidade] Data de atualização (render):", today);
-
-    const mailHref = `mailto:${COMPANY_EMAIL}`;
-    console.log("[/politica-privacidade] mailHref:", mailHref);
 
     return (
         <main className="mx-auto max-w-4xl px-6 py-12 space-y-10">
@@ -52,15 +50,7 @@ export default function PoliticaPrivacidadePage() {
                     O responsável pelo tratamento é <strong>{COMPANY_NAME}</strong>, com
                     sede em {COMPANY_ADDR}. Para qualquer questão relacionada com
                     privacidade, contacte-nos em{" "}
-                    <a
-                        href={mailHref}
-                        className="text-emerald-700 font-medium hover:underline"
-                        onClick={() =>
-                            console.log("[/politica-privacidade] click mailto:", mailHref)
-                        }
-                    >
-                        {COMPANY_EMAIL}
-                    </a>
+                    <MailLink email={COMPANY_EMAIL} className="text-emerald-700 font-medium hover:underline" />
                     .
                 </p>
             </section>
@@ -141,15 +131,7 @@ export default function PoliticaPrivacidadePage() {
                     <strong>apagamento</strong>, <strong>limitação</strong>,{" "}
                     <strong>oposição</strong> e <strong>portabilidade</strong> dos seus
                     dados. Para exercer, contacte{" "}
-                    <a
-                        href={mailHref}
-                        className="text-emerald-700 font-medium hover:underline"
-                        onClick={() =>
-                            console.log("[/politica-privacidade] click mailto:", mailHref)
-                        }
-                    >
-                        {COMPANY_EMAIL}
-                    </a>
+                    <MailLink email={COMPANY_EMAIL} className="text-emerald-700 font-medium hover:underline" />
                     .
                 </p>
                 <p className="text-gray-700">
@@ -159,9 +141,6 @@ export default function PoliticaPrivacidadePage() {
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-emerald-700 font-medium hover:underline"
-                        onClick={() =>
-                            console.log("[/politica-privacidade] click CNPD:", "https://www.cnpd.pt/")
-                        }
                     >
                         CNPD — Comissão Nacional de Proteção de Dados
                     </a>
@@ -216,15 +195,7 @@ export default function PoliticaPrivacidadePage() {
                     <li>{COMPANY_ADDR}</li>
                     <li>
                         E-mail:{" "}
-                        <a
-                            href={mailHref}
-                            className="text-emerald-700 font-medium hover:underline"
-                            onClick={() =>
-                                console.log("[/politica-privacidade] click mailto:", mailHref)
-                            }
-                        >
-                            {COMPANY_EMAIL}
-                        </a>
+                        <MailLink email={COMPANY_EMAIL} className="text-emerald-700 font-medium hover:underline" />
                     </li>
                 </ul>
                 <p className="text-sm text-gray-500 mt-2">Última atualização: {today}</p>
