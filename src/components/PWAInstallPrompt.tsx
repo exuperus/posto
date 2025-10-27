@@ -30,15 +30,14 @@ export default function PWAInstallPrompt() {
             e.preventDefault();
             deferredPrompt = e;
             setInstallPrompt(deferredPrompt);
-            
-            // Mostra prompt se não está em modo standalone
-            if (!standalone) {
-                setShowPrompt(true);
-            }
         });
 
-        // Mostra prompt no iOS depois de 3 segundos
-        if (checkIOS && !standalone) {
+        // Verifica se já dispensou (dentro de 24h)
+        const dismissedTime = localStorage.getItem("pwa_prompt_dismissed");
+        const wasDismissed = dismissedTime && (Date.now() - Number(dismissedTime) < 86400000);
+
+        // Mostra prompt APÓS 3 SEGUNDOS se não está instalado nem dispensou
+        if (!standalone && !wasDismissed) {
             const timer = setTimeout(() => {
                 setShowPrompt(true);
             }, 3000);
@@ -64,10 +63,8 @@ export default function PWAInstallPrompt() {
         localStorage.setItem("pwa_prompt_dismissed", Date.now().toString());
     };
 
-    // Não mostra se:
-    // - Está em modo standalone (já instalado)
-    // - Usuário dispensou recentemente
-    if (showPrompt && !isStandalone) {
+    // Mostra se: showPrompt é true (despois de 3 seg)
+    if (showPrompt) {
         return (
             <div className="fixed bottom-4 left-4 right-4 z-50 max-w-md mx-auto animate-fade-in-up">
                 <div className="bg-white border-2 border-emerald-500 rounded-2xl shadow-2xl p-5 relative">
