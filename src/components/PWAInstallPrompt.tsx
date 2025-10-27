@@ -86,8 +86,8 @@ export default function PWAInstallPrompt() {
                             <h3 className="font-semibold text-gray-900">Instalar App</h3>
                             {isIOS ? (
                                 <p className="text-sm text-gray-600 mt-1">
-                                    Adicione à tela inicial para acesso rápido: <strong>⋮ Menu</strong> →
-                                    <strong> Adicionar à Tela Inicial</strong>
+                                    Adicione ao ecrã principal para acesso rápido: <strong>⋮ Menu</strong> →
+                                    <strong> Adicionar ao Ecrã Principal</strong>
                                 </p>
                             ) : (
                                 <p className="text-sm text-gray-600 mt-1">
