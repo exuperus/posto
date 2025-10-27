@@ -248,7 +248,7 @@ export default function FuelCalculator() {
             {/* Dica */}
             <div className="mt-4 p-3 bg-gray-50 rounded-lg">
                 <p className="text-xs text-gray-600">
-                    💡 <strong>Dica:</strong> Os valores são aproximados. O consumo real pode variar conforme o estilo de condução e condições da estrada.
+                     <strong>Dica:</strong> Os valores são aproximados. O consumo real pode variar conforme o estilo de condução e condições da estrada.
                 </p>
             </div>
         </div>

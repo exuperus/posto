@@ -14,10 +14,10 @@ export default function MobileMenu({ isHome }: MobileMenuProps) {
     const pathname = usePathname();
 
     const links = [
-        { href: "/combustiveis", label: "Combustíveis", icon: "⛽" },
-        { href: "/produtos", label: "Produtos", icon: "📦" },
-        { href: "/transporte-domicilio", label: "Transporte Domicílio", icon: "🚚" },
-        { href: "/contactos", label: "Contactos", icon: "📞" },
+        { href: "/combustiveis", label: "Combustíveis" },
+        { href: "/produtos", label: "Produtos" },
+        { href: "/transporte-domicilio", label: "Transporte Domicílio" },
+        { href: "/contactos", label: "Contactos" },
     ];
 
     const PHONE = process.env.NEXT_PUBLIC_PHONE ?? "938452320";
@@ -72,7 +72,7 @@ export default function MobileMenu({ isHome }: MobileMenuProps) {
 
                 {/* Links de navegação */}
                 <nav className="p-4 space-y-2">
-                    {links.map(({ href, label, icon }) => {
+                    {links.map(({ href, label }) => {
                         const active = pathname === href;
                         return (
                             <Link
@@ -87,7 +87,6 @@ export default function MobileMenu({ isHome }: MobileMenuProps) {
                                     }
                                 `}
                             >
-                                <span className="text-xl">{icon}</span>
                                 <span className="font-medium">{label}</span>
                                 {active && <span className="ml-auto text-green-600">●</span>}
                             </Link>
