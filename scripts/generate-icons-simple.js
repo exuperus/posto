@@ -79,3 +79,4 @@ function convertSvgToPng(svgPath, size) {
   }
 }
 
+

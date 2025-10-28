@@ -149,3 +149,4 @@ Para verificar a qualidade do PWA:
 3. **Splash Screen** - Tela de carregamento personalizada
 4. **Analytics** - Ver quantos instalaram
 
+

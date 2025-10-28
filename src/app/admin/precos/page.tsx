@@ -35,7 +35,7 @@ export default function AdminPrecosPage() {
 
     useEffect(() => {
         (async () => {
-            const r = await fetch('/api/fuels', { cache: 'no-store' });
+            const r = await fetch('/api/combustiveis', { cache: 'no-store' });
             if (!r.ok) return;
             const data: FuelApiRow[] = await r.json();
 
