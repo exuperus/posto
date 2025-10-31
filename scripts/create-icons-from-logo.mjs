@@ -52,3 +52,4 @@ console.log('✨ Ícones PWA criados com sucesso a partir do logotipo!');
 
 
 
+
