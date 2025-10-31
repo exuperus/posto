@@ -144,3 +144,8 @@ R: Sim! Chrome, Edge, Safari (iOS 11+), Firefox, Samsung Internet.
 **Conclusão:** PWA é a escolha mais inteligente para o seu negócio! 💪
 
 
+
+
+
+
+

@@ -150,3 +150,8 @@ Para verificar a qualidade do PWA:
 4. **Analytics** - Ver quantos instalaram
 
 
+
+
+
+
+

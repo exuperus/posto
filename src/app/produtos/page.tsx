@@ -11,7 +11,7 @@ import BackButton from "@/components/BackButton";
 import RelatedPages from "@/components/RelatedPages";
 import type { Metadata } from "next";
 
-export const revalidate = 300;
+export const revalidate = 30;
 
 export const metadata: Metadata = {
     title: "Catálogo Produtos - Sandrina & Mário, LDA | Lubrificantes e Acessórios",
@@ -143,13 +143,13 @@ export default async function ProdutosPage(props: PageProps) {
                             className="group rounded-2xl border ring-1 shadow-sm bg-white overflow-hidden hover:shadow-md transition"
                         >
                             {/* Header com imagem ou decorativo por categoria */}
-                            <div className="relative h-28 overflow-hidden">
+                            <div className="relative h-40 overflow-hidden bg-white">
                                 {p.imagemUrl ? (
                                     <Image
                                         src={p.imagemUrl}
                                         alt={p.nome}
                                         fill
-                                        className="object-cover"
+                                        className="object-contain p-3"
                                         sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                                     />
                                 ) : (
