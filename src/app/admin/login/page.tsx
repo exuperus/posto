@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function AdminLoginPage() {
     console.log("[AdminLoginPage] Página carregada no cliente.");
@@ -9,6 +10,7 @@ export default function AdminLoginPage() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
     const [ok, setOk] = useState(false);
+    const router = useRouter();
 
     async function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
@@ -36,8 +38,7 @@ export default function AdminLoginPage() {
 
             setOk(true);
             console.log("[AdminLoginPage] Login bem-sucedido.");
-            // Em apps reais, redirecionarias o admin:
-            // window.location.href = "/admin/painel";
+            router.push("/admin/precos");
         } catch (err) {
             console.error("[AdminLoginPage] Erro no fetch:", err);
             setError("Falha de rede ou servidor.");
