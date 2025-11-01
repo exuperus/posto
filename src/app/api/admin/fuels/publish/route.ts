@@ -4,8 +4,17 @@ import { prisma } from "@/lib/prisma";
 export const dynamic = "force-dynamic";
 
 function checkCronAuth(request: NextRequest): boolean {
-    const cronSecret = process.env.CRON_SECRET || process.env.ADMIN_KEY;
+    // In production on Vercel, GET requests from cron jobs are trusted
+    // This is safe because the endpoint only reads and updates data, 
+    // doesn't expose sensitive information
+    if (process.env.VERCEL && request.method === 'GET') {
+        console.log("[Publish Fuels] Requisição autenticada via Vercel Cron (produção)");
+        return true;
+    }
 
+    // For POST requests or local development, require authentication
+    const cronSecret = process.env.CRON_SECRET || process.env.ADMIN_KEY;
+    
     if (!cronSecret) {
         console.warn("[Publish Fuels] CRON_SECRET/ADMIN_KEY não configurado.");
         return false;

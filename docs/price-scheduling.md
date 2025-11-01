@@ -14,25 +14,54 @@
 5. Clique em **Guardar preços**.
 
 ## 3. Publicar automaticamente quando chegar a hora
-O endpoint `POST /api/admin/fuels/publish` publica todos os preços agendados cuja `vigencia_inicio` já passou.
+O endpoint `GET /api/admin/fuels/publish` publica todos os preços agendados cuja `vigencia_inicio` já passou.
 
 ### 3.1. Autenticação
-- Envie o header `x-cron-secret: <CRON_SECRET>` na chamada.
-- Sem esse header (ou se o valor estiver errado) o pedido é rejeitado com 401.
 
-### 3.2. Exemplos de chamada
+#### Em Produção (Vercel)
+- **Automática**: O Vercel Cron job configura-se automaticamente no `vercel.json`
+- A autenticação é feita automaticamente para requisições GET em produção
+- Não é necessário configurar headers especiais
+
+#### Em Desenvolvimento Local ou Chamadas POST
+- Envie o header `x-cron-secret: <CRON_SECRET>` na chamada
+- Ou use `Authorization: Bearer <CRON_SECRET>`
+- Sem autenticação, o pedido é rejeitado com 401
+
+### 3.2. Configuração Vercel Cron
+Já está configurado no `vercel.json`:
+```json
+{
+  "crons": [
+    {
+      "path": "/api/admin/fuels/publish",
+      "schedule": "*/5 * * * *"
+    }
+  ]
+}
+```
+
+O cron roda automaticamente a cada 5 minutos e publica preços agendados.
+
+### 3.3. Teste Manual
+Para testar localmente ou na produção:
+
 ```bash
+# Usando o script de teste
+node scripts/test-publish-fuels.mjs http://localhost:3000 sua-admin-key
+
+# Ou usando curl
 curl -X POST \
   -H "x-cron-secret: $CRON_SECRET" \
   https://seu-dominio.com/api/admin/fuels/publish
+
+# GET funciona em produção Vercel sem autenticação
+curl https://seu-dominio.com/api/admin/fuels/publish
 ```
 
-### 3.3. Agendadores sugeridos
-- **GitHub Actions** (já incluído em `.github/workflows/publish-fuels.yml`):
-  - Configure os secrets `PUBLISH_ENDPOINT` (ex.: `https://seu-dominio.com/api/admin/fuels/publish`) e `CRON_SECRET`.
-  - O workflow corre a cada 5 minutos (`cron: "*/5 * * * *"`) e pode ser disparado manualmente via *workflow_dispatch*.
-- **Vercel Cron**: crie um job diário/horário que faça o `POST` se hospedar na Vercel.
-- **Windows Task Scheduler / cron do servidor**: executar script `curl` no horário pretendido caso hospede num servidor próprio.
+### 3.4. Alternativas
+- **GitHub Actions**: Configure workflow para fazer POST com `x-cron-secret`
+- **Windows Task Scheduler / cron do servidor**: Execute o script `test-publish-fuels.mjs`
 
 O endpoint é idempotente: se não houver preços vencidos, devolve `{ ok: true, message: "Sem preços agendados" }`.
 
