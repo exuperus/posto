@@ -1,0 +1,9 @@
+{
+  "crons": [
+    {
+      "path": "/api/admin/fuels/publish",
+      "schedule": "*/5 * * * *"
+    }
+  ]
+}
+

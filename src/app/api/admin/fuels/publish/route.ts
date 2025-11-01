@@ -4,7 +4,6 @@ import { prisma } from "@/lib/prisma";
 export const dynamic = "force-dynamic";
 
 function checkCronAuth(request: NextRequest): boolean {
-    const headerKey = request.headers.get("x-cron-secret");
     const cronSecret = process.env.CRON_SECRET || process.env.ADMIN_KEY;
 
     if (!cronSecret) {
@@ -12,16 +11,29 @@ function checkCronAuth(request: NextRequest): boolean {
         return false;
     }
 
-    return headerKey === cronSecret;
+    const headerKey = request.headers.get("x-cron-secret");
+    if (headerKey && headerKey === cronSecret) {
+        return true;
+    }
+
+    const authHeader = request.headers.get("authorization");
+    if (authHeader) {
+        const match = authHeader.match(/^Bearer\s+(.+)$/i);
+        if (match && match[1] === cronSecret) {
+            return true;
+        }
+    }
+
+    return false;
 }
 
-export async function POST(request: NextRequest) {
+async function handlePublish(request: NextRequest) {
     if (!checkCronAuth(request)) {
         return NextResponse.json({ error: "Acesso não autorizado" }, { status: 401 });
     }
 
     const now = new Date();
-    console.log(`[Publish Fuels] Iniciando publicação automática às ${now.toISOString()}`);
+    console.log(`[Publish Fuels] (${request.method}) Iniciando publicação automática às ${now.toISOString()}`);
 
     const dueFuels = await prisma.fuel.findMany({
         where: {
@@ -73,5 +85,13 @@ export async function POST(request: NextRequest) {
     console.log(`[Publish Fuels] Publicação concluída. Total: ${published.length}`);
 
     return NextResponse.json({ ok: true, published });
+}
+
+export async function POST(request: NextRequest) {
+    return handlePublish(request);
+}
+
+export async function GET(request: NextRequest) {
+    return handlePublish(request);
 }
 
