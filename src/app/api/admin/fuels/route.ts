@@ -56,6 +56,7 @@ export async function PUT(request: NextRequest) {
 
         // Processar cada item
         const results = [];
+        const now = new Date();
         for (const item of body.items) {
             console.log(`Processando combustível: ${item.tipo}`);
 
@@ -72,7 +73,14 @@ export async function PUT(request: NextRequest) {
             // Data de vigência
             const vigenciaInicio = item.vigencia_inicio 
                 ? new Date(item.vigencia_inicio)
-                : new Date(); // Se não especificada, usar data atual
+                : now; // Se não especificada, usar data atual
+
+            if (Number.isNaN(vigenciaInicio.getTime())) {
+                console.warn(`Data de vigência inválida para ${item.tipo}:`, item.vigencia_inicio);
+                continue;
+            }
+
+            const publicarAgora = vigenciaInicio <= now;
 
             // Buscar registro existente
             const existingFuel = await prisma.fuel.findFirst({
@@ -84,7 +92,7 @@ export async function PUT(request: NextRequest) {
             });
 
             // Se existe um preço anterior, arquivar o atual
-            if (existingFuel) {
+            if (publicarAgora && existingFuel) {
                 await prisma.fuel.update({
                     where: { id: existingFuel.id },
                     data: {
@@ -100,10 +108,12 @@ export async function PUT(request: NextRequest) {
                 data: {
                     tipo: item.tipo,
                     preco_atual: precoAtual,
-                    preco_anterior: existingFuel?.preco_atual || null,
+                    preco_anterior: existingFuel?.preco_atual || precoAnterior,
                     vigencia_inicio: vigenciaInicio,
-                    publicado: true,
-                    observacoes: `Atualizado em ${new Date().toISOString()}`
+                    publicado: publicarAgora,
+                    observacoes: publicarAgora
+                        ? `Atualizado em ${now.toISOString()}`
+                        : `Agendado em ${now.toISOString()} para publicação em ${vigenciaInicio.toISOString()}`
                 }
             });
 
@@ -111,10 +121,13 @@ export async function PUT(request: NextRequest) {
                 tipo: item.tipo,
                 id: newFuel.id,
                 preco_atual: newFuel.preco_atual.toString(),
-                vigencia_inicio: newFuel.vigencia_inicio.toISOString()
+                vigencia_inicio: newFuel.vigencia_inicio.toISOString(),
+                publicado: newFuel.publicado
             });
 
-            console.log(`✅ Preço atualizado para ${item.tipo}: €${precoAtual}/L`);
+            console.log(
+                `✅ ${publicarAgora ? 'Preço publicado' : 'Preço agendado'} para ${item.tipo}: €${precoAtual}/L (vigência: ${vigenciaInicio.toISOString()})`
+            );
         }
 
         console.log(`Processamento concluído: ${results.length} combustíveis atualizados`);

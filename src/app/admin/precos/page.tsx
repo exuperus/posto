@@ -1,5 +1,5 @@
-'use client';
-import { useEffect, useState } from 'react';
+"use client";
+import { useEffect, useRef, useState } from "react";
 
 type Tipo = 'GASOLEO' | 'GASOLEO_HI_ENERGY' | 'GASOLINA_95';
 
@@ -30,8 +30,10 @@ export default function AdminPrecosPage() {
         { tipo: 'GASOLINA_95', preco_atual: 0, preco_anterior: null },
     ]);
     const [date, setDate] = useState<string>('');
+    const [time, setTime] = useState<string>('06:00');
     const [saving, setSaving] = useState(false);
     const [msg, setMsg] = useState<string | null>(null);
+    const scheduleLoadedRef = useRef(false);
 
     useEffect(() => {
         (async () => {
@@ -56,13 +58,19 @@ export default function AdminPrecosPage() {
                                 precoAnterior === null || Number.isFinite(precoAnterior) ? precoAnterior : null,
                         };
                     }
-                    if (!date && f.vigencia_inicio) {
-                        // só define a data uma vez
-                        setDate(new Date(f.vigencia_inicio).toISOString().slice(0, 10));
-                    }
                 }
                 return next;
             });
+
+            if (!scheduleLoadedRef.current) {
+                const withSchedule = data.find((f) => f.vigencia_inicio);
+                if (withSchedule?.vigencia_inicio) {
+                    const dt = new Date(withSchedule.vigencia_inicio);
+                    setDate(dt.toISOString().slice(0, 10));
+                    setTime(dt.toISOString().slice(11, 16));
+                    scheduleLoadedRef.current = true;
+                }
+            }
         })();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
@@ -88,8 +96,9 @@ export default function AdminPrecosPage() {
         setSaving(true);
         setMsg(null);
 
+        const isoDate = date ? `${date}T${(time || '00:00').padEnd(5, '0')}` : null;
         const payload: { items: Array<Row & { vigencia_inicio: string | null }> } = {
-            items: rows.map((r) => ({ ...r, vigencia_inicio: date || null })),
+            items: rows.map((r) => ({ ...r, vigencia_inicio: isoDate ? new Date(isoDate).toISOString() : null })),
         };
 
         const res = await fetch('/api/admin/fuels', {
@@ -108,16 +117,29 @@ export default function AdminPrecosPage() {
 
             <form onSubmit={onSubmit} className="space-y-4">
                 <div className="rounded-2xl border bg-white overflow-x-auto">
-                    <div className="p-4">
-                        <label className="text-sm">
-                            Vigência
+                    <div className="p-4 flex flex-col gap-3 md:flex-row md:items-center">
+                        <label className="text-sm flex items-center gap-2">
+                            Vigência (data)
                             <input
                                 type="date"
-                                className="ml-2 rounded border px-2 py-1"
+                                className="rounded border px-2 py-1"
                                 value={date}
                                 onChange={(e) => setDate(e.target.value)}
                             />
                         </label>
+                        <label className="text-sm flex items-center gap-2">
+                            Hora
+                            <input
+                                type="time"
+                                className="rounded border px-2 py-1"
+                                value={time}
+                                onChange={(e) => setTime(e.target.value)}
+                                step={60}
+                            />
+                        </label>
+                        <span className="text-xs text-gray-500">
+                            Se escolher uma data/horário no futuro, o preço fica agendado e só será publicado nessa altura.
+                        </span>
                     </div>
 
                     <table className="w-full text-sm">
