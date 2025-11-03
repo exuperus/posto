@@ -39,39 +39,71 @@ export default function AdminPrecosPage() {
 
     useEffect(() => {
         (async () => {
-            const r = await fetch('/api/combustiveis', { cache: 'no-store' });
-            if (!r.ok) return;
-            const data: FuelApiRow[] = await r.json();
+            try {
+                const r = await fetch('/api/combustiveis', { cache: 'no-store' });
+                if (!r.ok) {
+                    console.warn('[Admin Preços] Erro ao buscar combustíveis:', r.status, r.statusText);
+                    return;
+                }
+                const data: FuelApiRow[] = await r.json();
 
-            setRows((prev) => {
-                const next = [...prev];
-                for (const f of data) {
-                    const i = next.findIndex((r) => r.tipo === f.tipo);
-                    if (i >= 0) {
-                        const precoAtual =
-                            f.preco_atual == null ? 0 : Number(String(f.preco_atual).replace(',', '.'));
-                        const precoAnterior =
-                            f.preco_anterior == null ? null : Number(String(f.preco_anterior).replace(',', '.'));
+                setRows((prev) => {
+                    // Garantir que todos os tipos sempre estão presentes
+                    const tiposEsperados: Tipo[] = ['GASOLEO', 'GASOLEO_HI_ENERGY', 'GASOLINA_95', 'GASOLEO_AGRICOLA'];
+                    const next: Row[] = tiposEsperados.map((tipo) => {
+                        const existing = prev.find((r) => r.tipo === tipo);
+                        const apiData = data.find((f) => f.tipo === tipo);
+                        
+                        if (apiData) {
+                            const precoAtual =
+                                apiData.preco_atual == null ? 0 : Number(String(apiData.preco_atual).replace(',', '.'));
+                            const precoAnterior =
+                                apiData.preco_anterior == null ? null : Number(String(apiData.preco_anterior).replace(',', '.'));
 
-                        next[i] = {
-                            ...next[i],
-                            preco_atual: Number.isFinite(precoAtual) ? precoAtual : 0,
-                            preco_anterior:
-                                precoAnterior === null || Number.isFinite(precoAnterior) ? precoAnterior : null,
+                            return {
+                                tipo,
+                                preco_atual: Number.isFinite(precoAtual) ? precoAtual : 0,
+                                preco_anterior:
+                                    precoAnterior === null || Number.isFinite(precoAnterior) ? precoAnterior : null,
+                            };
+                        }
+                        
+                        // Se não existe na API mas existe no estado anterior, manter
+                        if (existing) {
+                            return existing;
+                        }
+                        
+                        // Se não existe nem na API nem no estado, criar novo com valores padrão
+                        return {
+                            tipo,
+                            preco_atual: 0,
+                            preco_anterior: null,
                         };
+                    });
+                    
+                    return next;
+                });
+
+                if (!scheduleLoadedRef.current) {
+                    const withSchedule = data.find((f) => f.vigencia_inicio);
+                    if (withSchedule?.vigencia_inicio) {
+                        const dt = new Date(withSchedule.vigencia_inicio);
+                        setDate(dt.toISOString().slice(0, 10));
+                        setTime(dt.toISOString().slice(11, 16));
+                        scheduleLoadedRef.current = true;
                     }
                 }
-                return next;
-            });
-
-            if (!scheduleLoadedRef.current) {
-                const withSchedule = data.find((f) => f.vigencia_inicio);
-                if (withSchedule?.vigencia_inicio) {
-                    const dt = new Date(withSchedule.vigencia_inicio);
-                    setDate(dt.toISOString().slice(0, 10));
-                    setTime(dt.toISOString().slice(11, 16));
-                    scheduleLoadedRef.current = true;
-                }
+            } catch (error) {
+                console.error('[Admin Preços] Erro ao carregar dados:', error);
+                // Em caso de erro, garantir que todos os tipos ainda estão presentes
+                setRows((prev) => {
+                    const tiposEsperados: Tipo[] = ['GASOLEO', 'GASOLEO_HI_ENERGY', 'GASOLINA_95', 'GASOLEO_AGRICOLA'];
+                    const next: Row[] = tiposEsperados.map((tipo) => {
+                        const existing = prev.find((r) => r.tipo === tipo);
+                        return existing || { tipo, preco_atual: 0, preco_anterior: null };
+                    });
+                    return next;
+                });
             }
         })();
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -153,6 +185,13 @@ export default function AdminPrecosPage() {
                         </tr>
                         </thead>
                         <tbody>
+                        {rows.length === 0 && (
+                            <tr>
+                                <td colSpan={3} className="p-3 text-center text-gray-500">
+                                    A carregar...
+                                </td>
+                            </tr>
+                        )}
                         {rows.map((r, i) => (
                             <tr key={r.tipo} className="border-t">
                                 <td className="p-3 font-medium">{LABELS[r.tipo]}</td>

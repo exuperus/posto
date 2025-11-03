@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import type { FuelType } from "@prisma/client";
+import { Decimal } from "@prisma/client/runtime/library";
 
 export const dynamic = "force-dynamic";
 
@@ -71,18 +72,20 @@ export async function PUT(request: NextRequest) {
             const precoAnterior = item.preco_anterior !== null ? new Decimal(item.preco_anterior) : null;
             
             // Data de vigência
-            const vigenciaInicio = item.vigencia_inicio 
+            // Se não especificada ou vazia, usar data atual (publicar imediatamente)
+            const vigenciaInicio = item.vigencia_inicio && item.vigencia_inicio.trim() !== ''
                 ? new Date(item.vigencia_inicio)
-                : now; // Se não especificada, usar data atual
+                : new Date(); // Se não especificada, usar data atual
 
             if (Number.isNaN(vigenciaInicio.getTime())) {
                 console.warn(`Data de vigência inválida para ${item.tipo}:`, item.vigencia_inicio);
                 continue;
             }
 
-            const publicarAgora = vigenciaInicio <= now;
+            // Publicar agora se a vigência for no passado ou presente (com margem de 1 segundo para evitar problemas de timing)
+            const publicarAgora = vigenciaInicio.getTime() <= (now.getTime() + 1000);
 
-            // Buscar registro existente
+            // Buscar registro existente publicado
             const existingFuel = await prisma.fuel.findFirst({
                 where: {
                     tipo: item.tipo,
@@ -91,16 +94,45 @@ export async function PUT(request: NextRequest) {
                 orderBy: { vigencia_inicio: 'desc' }
             });
 
-            // Se existe um preço anterior, arquivar o atual
-            if (publicarAgora && existingFuel) {
-                await prisma.fuel.update({
-                    where: { id: existingFuel.id },
-                    data: {
-                        publicado: false,
-                        updatedAt: new Date()
-                    }
+            // Se vamos publicar agora, arquivar todos os preços anteriores publicados do mesmo tipo
+            if (publicarAgora) {
+                // Arquivar o preço publicado atual (se existir)
+                if (existingFuel) {
+                    await prisma.fuel.update({
+                        where: { id: existingFuel.id },
+                        data: {
+                            publicado: false,
+                            updatedAt: new Date()
+                        }
+                    });
+                    console.log(`Arquivado preço anterior publicado para ${item.tipo} (ID: ${existingFuel.id})`);
+                }
+                
+                // Também arquivar qualquer outro registro publicado do mesmo tipo (segurança extra)
+                // Isso garante que não há múltiplos preços publicados ao mesmo tempo
+                const whereClause: any = {
+                    tipo: item.tipo,
+                    publicado: true
+                };
+                
+                if (existingFuel) {
+                    whereClause.id = { not: existingFuel.id };
+                }
+                
+                const outrosPublicados = await prisma.fuel.findMany({
+                    where: whereClause
                 });
-                console.log(`Arquivado preço anterior para ${item.tipo}`);
+                
+                if (outrosPublicados.length > 0) {
+                    await prisma.fuel.updateMany({
+                        where: whereClause,
+                        data: {
+                            publicado: false,
+                            updatedAt: new Date()
+                        }
+                    });
+                    console.log(`Arquivados ${outrosPublicados.length} outros registros publicados para ${item.tipo}`);
+                }
             }
 
             // Criar novo registro
@@ -151,6 +183,3 @@ export async function PUT(request: NextRequest) {
         console.log("[PUT /api/admin/fuels] Execução terminada.\n");
     }
 }
-
-// Import necessário para Decimal
-import { Decimal } from "@prisma/client/runtime/library";
