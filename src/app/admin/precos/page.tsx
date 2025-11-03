@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 
-type Tipo = 'GASOLEO' | 'GASOLEO_HI_ENERGY' | 'GASOLINA_95';
+type Tipo = 'GASOLEO' | 'GASOLEO_HI_ENERGY' | 'GASOLINA_95' | 'GASOLEO_AGRICOLA';
 
 type Row = {
     tipo: Tipo;
@@ -21,6 +21,7 @@ const LABELS: Record<Tipo, string> = {
     GASOLEO: 'Gasóleo',
     GASOLEO_HI_ENERGY: 'Gasóleo Hi-Energy',
     GASOLINA_95: 'Gasolina 95',
+    GASOLEO_AGRICOLA: 'Gasóleo Agrícola',
 };
 
 export default function AdminPrecosPage() {
@@ -28,6 +29,7 @@ export default function AdminPrecosPage() {
         { tipo: 'GASOLEO', preco_atual: 0, preco_anterior: null },
         { tipo: 'GASOLEO_HI_ENERGY', preco_atual: 0, preco_anterior: null },
         { tipo: 'GASOLINA_95', preco_atual: 0, preco_anterior: null },
+        { tipo: 'GASOLEO_AGRICOLA', preco_atual: 0, preco_anterior: null },
     ]);
     const [date, setDate] = useState<string>('');
     const [time, setTime] = useState<string>('06:00');
