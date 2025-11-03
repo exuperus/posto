@@ -24,13 +24,17 @@ const LABELS: Record<Tipo, string> = {
     GASOLEO_AGRICOLA: 'Gasóleo Agrícola',
 };
 
+// Ordem garantida dos tipos para garantir que GASOLEO_AGRICOLA sempre aparece
+const TIPOS_ORDENADOS: Tipo[] = ['GASOLEO', 'GASOLEO_HI_ENERGY', 'GASOLINA_95', 'GASOLEO_AGRICOLA'];
+
 export default function AdminPrecosPage() {
-    const [rows, setRows] = useState<Row[]>([
-        { tipo: 'GASOLEO', preco_atual: 0, preco_anterior: null },
-        { tipo: 'GASOLEO_HI_ENERGY', preco_atual: 0, preco_anterior: null },
-        { tipo: 'GASOLINA_95', preco_atual: 0, preco_anterior: null },
-        { tipo: 'GASOLEO_AGRICOLA', preco_atual: 0, preco_anterior: null },
-    ]);
+    const initialState: Row[] = TIPOS_ORDENADOS.map(tipo => ({
+        tipo,
+        preco_atual: 0,
+        preco_anterior: null,
+    }));
+    
+    const [rows, setRows] = useState<Row[]>(initialState);
     const [date, setDate] = useState<string>('');
     const [time, setTime] = useState<string>('06:00');
     const [saving, setSaving] = useState(false);
@@ -48,9 +52,8 @@ export default function AdminPrecosPage() {
                 const data: FuelApiRow[] = await r.json();
 
                 setRows((prev) => {
-                    // Garantir que todos os tipos sempre estão presentes
-                    const tiposEsperados: Tipo[] = ['GASOLEO', 'GASOLEO_HI_ENERGY', 'GASOLINA_95', 'GASOLEO_AGRICOLA'];
-                    const next: Row[] = tiposEsperados.map((tipo) => {
+                    // Garantir que todos os tipos sempre estão presentes na ordem correta
+                    const next: Row[] = TIPOS_ORDENADOS.map((tipo) => {
                         const existing = prev.find((r) => r.tipo === tipo);
                         const apiData = data.find((f) => f.tipo === tipo);
                         
@@ -97,8 +100,7 @@ export default function AdminPrecosPage() {
                 console.error('[Admin Preços] Erro ao carregar dados:', error);
                 // Em caso de erro, garantir que todos os tipos ainda estão presentes
                 setRows((prev) => {
-                    const tiposEsperados: Tipo[] = ['GASOLEO', 'GASOLEO_HI_ENERGY', 'GASOLINA_95', 'GASOLEO_AGRICOLA'];
-                    const next: Row[] = tiposEsperados.map((tipo) => {
+                    const next: Row[] = TIPOS_ORDENADOS.map((tipo) => {
                         const existing = prev.find((r) => r.tipo === tipo);
                         return existing || { tipo, preco_atual: 0, preco_anterior: null };
                     });
@@ -109,20 +111,24 @@ export default function AdminPrecosPage() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    function onChange(i: number, field: 'preco_atual' | 'preco_anterior', value: string) {
-        setRows((prev) =>
-            prev.map((r, idx) => {
-                if (idx !== i) return r;
-                if (field === 'preco_atual') {
-                    const num = value.trim() === '' ? 0 : Number(value.replace(',', '.'));
-                    return { ...r, preco_atual: Number.isFinite(num) ? num : 0 };
-                } else {
-                    const raw = value.trim() === '' ? null : Number(value.replace(',', '.'));
-                    const num = raw === null ? null : Number.isFinite(raw) ? (raw as number) : null;
-                    return { ...r, preco_anterior: num };
-                }
-            })
-        );
+    function onChange(tipo: Tipo, field: 'preco_atual' | 'preco_anterior', value: string) {
+        setRows((prev) => {
+            const existing = prev.find(r => r.tipo === tipo);
+            const base = existing || { tipo, preco_atual: 0, preco_anterior: null };
+            
+            let updated: Row;
+            if (field === 'preco_atual') {
+                const num = value.trim() === '' ? 0 : Number(value.replace(',', '.'));
+                updated = { ...base, preco_atual: Number.isFinite(num) ? num : 0 };
+            } else {
+                const raw = value.trim() === '' ? null : Number(value.replace(',', '.'));
+                const num = raw === null ? null : Number.isFinite(raw) ? (raw as number) : null;
+                updated = { ...base, preco_anterior: num };
+            }
+            
+            // Garantir que todos os tipos estão presentes na ordem correta
+            return TIPOS_ORDENADOS.map(t => t === tipo ? updated : (prev.find(r => r.tipo === t) || { tipo: t, preco_atual: 0, preco_anterior: null }));
+        });
     }
 
     async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -192,15 +198,17 @@ export default function AdminPrecosPage() {
                                 </td>
                             </tr>
                         )}
-                        {rows.map((r, i) => (
-                            <tr key={r.tipo} className="border-t">
-                                <td className="p-3 font-medium">{LABELS[r.tipo]}</td>
+                        {TIPOS_ORDENADOS.map((tipo, i) => {
+                            const r = rows.find(row => row.tipo === tipo) || { tipo, preco_atual: 0, preco_anterior: null };
+                            return (
+                            <tr key={tipo} className="border-t">
+                                <td className="p-3 font-medium">{LABELS[tipo]}</td>
 
                                 <td className="p-3 text-right">
                                     <input
                                         className="w-28 text-right rounded border px-2 py-1"
                                         value={r.preco_atual === 0 ? '' : String(r.preco_atual)}
-                                        onChange={(e) => onChange(i, 'preco_atual', e.target.value)}
+                                        onChange={(e) => onChange(tipo, 'preco_atual', e.target.value)}
                                         placeholder="0.00"
                                         inputMode="decimal"
                                     />
@@ -210,13 +218,14 @@ export default function AdminPrecosPage() {
                                     <input
                                         className="w-28 text-right rounded border px-2 py-1"
                                         value={r.preco_anterior ?? ''}
-                                        onChange={(e) => onChange(i, 'preco_anterior', e.target.value)}
+                                        onChange={(e) => onChange(tipo, 'preco_anterior', e.target.value)}
                                         placeholder="0.00"
                                         inputMode="decimal"
                                     />
                                 </td>
                             </tr>
-                        ))}
+                            );
+                        })}
                         </tbody>
                     </table>
                 </div>
