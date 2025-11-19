@@ -1,6 +1,6 @@
 // Service Worker para PWA
 // Atualizar a versão quando houver mudanças importantes para forçar atualização
-const CACHE_NAME = 'sandrina-mario-v2';
+const CACHE_NAME = 'sandrina-mario-v3';
 // Apenas cachear assets estáticos, NÃO páginas HTML
 const urlsToCache = [
   '/icon-192.png',

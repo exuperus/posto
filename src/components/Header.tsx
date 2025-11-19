@@ -36,10 +36,10 @@ export default function Header() {
                         : "sticky top-0 bg-white/90 backdrop-blur border-b border-gray-200",
                 ].join(" ")}
             >
-                <div className="flex items-center justify-end px-8 h-16">
+                <div className="flex items-center justify-end px-4 md:px-8 h-16">
                     <nav
                         className={[
-                            "hidden md:flex gap-6 text-sm md:text-base font-medium",
+                            "hidden md:flex gap-3 md:gap-4 lg:gap-6 text-xs md:text-sm lg:text-base font-medium flex-shrink-0",
                             isHome ? "text-white drop-shadow" : "text-gray-800",
                         ].join(" ")}
                     >
@@ -55,7 +55,7 @@ export default function Header() {
                                     console.log(`[Header] Clique no link: ${label} → ${href}`)
                                 }
                                 className={[
-                                    "relative transition-colors",
+                                    "relative transition-colors whitespace-nowrap flex-shrink-0",
                                     isHome
                                         ? active
                                             ? "text-lime-300"
