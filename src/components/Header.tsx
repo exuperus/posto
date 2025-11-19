@@ -32,12 +32,8 @@ export default function Header() {
                 className={[
                     "z-40 w-full",
                     isHome
-                        ? `absolute left-0 right-0 bg-gradient-to-b from-black/45 to-transparent transition-all duration-500 ${
-                            bannerVisible ? "top-[60px] md:top-[72px]" : "top-0"
-                          }`
-                        : `sticky bg-white/90 backdrop-blur border-b border-gray-200 transition-all duration-500 ${
-                            bannerVisible ? "top-[60px] md:top-[72px]" : "top-0"
-                          }`,
+                        ? "absolute top-0 left-0 right-0 bg-gradient-to-b from-black/45 to-transparent"
+                        : "sticky top-0 bg-white/90 backdrop-blur border-b border-gray-200",
                 ].join(" ")}
             >
                 <div className="flex items-center justify-end px-8 h-16">
