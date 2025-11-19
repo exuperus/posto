@@ -72,3 +72,4 @@ Ou ajuste o `vercel.json` para apontar corretamente.
 
 **Nota**: Após reconectar, o próximo push para `main` deve acionar deploy automático.
 
+

@@ -78,3 +78,22 @@ model Product {
   @@index([ativo, categoria])
 
 }
+
+model Voucher {
+  id                 String   @id @default(uuid())
+  codigo             String   @unique // ex: "LAV-7K2M-429"
+  deviceId           String   // Identificação anônima do dispositivo
+  valorAbastecimento Decimal? @db.Decimal(10, 2) // Valor declarado pelo cliente
+  numeroRecibo       String?  // Número do recibo/comprovante
+  fotoReciboUrl      String?  // URL da foto do recibo (prova de abastecimento)
+  usado              Boolean  @default(false)
+  usadoEm            DateTime?
+  expiraEm           DateTime
+  criadoEm           DateTime @default(now())
+  observacoes        String?  // Notas opcionais
+
+  @@index([codigo])
+  @@index([deviceId, criadoEm])
+  @@index([usado, expiraEm])
+  @@index([numeroRecibo])
+}

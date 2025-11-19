@@ -16,6 +16,7 @@ export default function Header() {
         { href: "/combustiveis", label: "Combustíveis" },
         { href: "/produtos", label: "Produtos" },
         { href: "/transporte-domicilio", label: "Transporte Domicílio" },
+        { href: "/promocoes", label: "Promoções" },
         { href: "/contactos", label: "Contactos" },
     ];
 
