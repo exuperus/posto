@@ -6,8 +6,9 @@ export function middleware(req: NextRequest) {
     const { pathname } = req.nextUrl
     // proteger páginas /admin (mas deixar /admin/login livre)
     if (pathname.startsWith('/admin') && !pathname.startsWith('/admin/login')) {
-        const cookie = req.cookies.get('ak')?.value
-        if (!cookie || cookie !== process.env.ADMIN_KEY) {
+        const cookie = req.cookies.get('ak')?.value?.trim()
+        const envKey = process.env.ADMIN_KEY?.trim()
+        if (!cookie || !envKey || cookie !== envKey) {
             const url = req.nextUrl.clone()
             url.pathname = '/admin/login'
             return NextResponse.redirect(url)
