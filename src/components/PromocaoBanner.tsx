@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Gift, X, ArrowRight } from "lucide-react";
+import { X } from "lucide-react";
 import Link from "next/link";
 
 export default function PromocaoBanner() {
@@ -16,7 +16,7 @@ export default function PromocaoBanner() {
         const wasDismissed = localStorage.getItem(todayKey);
 
         if (!wasDismissed) {
-            // Mostrar o banner
+            // Mostrar a notificação
             setIsVisible(true);
 
             // Auto-fechar após 10 segundos
@@ -46,70 +46,56 @@ export default function PromocaoBanner() {
     }
 
     return (
-        <>
-            {/* Spacer para empurrar o conteúdo para baixo quando o banner está visível */}
-            {isVisible && (
-                <div className="h-[60px] md:h-[72px]" aria-hidden="true" />
-            )}
-            <div
-                className={`
-                    fixed top-0 left-0 right-0 z-50
-                    bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-600
-                    text-gray-900 shadow-lg
-                    transform transition-all duration-500 ease-in-out
-                    ${isVisible ? "translate-y-0 opacity-100" : "-translate-y-full opacity-0"}
-                `}
-            >
-            <div className="container-pro mx-auto px-4 py-3">
-                <div className="flex items-center justify-between gap-4">
-                    {/* Conteúdo */}
-                    <div className="flex items-center gap-3 flex-1">
-                        <div className="p-2 rounded-lg bg-yellow-300/50">
-                            <Gift className="h-5 w-5 text-yellow-900" />
-                        </div>
-                        <div className="flex-1">
-                            <p className="font-bold text-sm md:text-base">
-                                🎉 <strong>Promoção Especial!</strong> Abasteça 50€ ou mais e ganhe uma{" "}
-                                <strong>lavagem grátis!</strong>
-                            </p>
-                        </div>
-                    </div>
+        <div
+            className={`
+                fixed bottom-4 right-4 z-50
+                max-w-sm
+                bg-white border-2 border-green-500
+                rounded-lg shadow-2xl
+                transform transition-all duration-500 ease-in-out
+                ${isVisible ? "translate-x-0 opacity-100" : "translate-x-full opacity-0"}
+            `}
+        >
+            <div className="p-4">
+                {/* Botão fechar */}
+                <button
+                    onClick={handleDismiss}
+                    className="
+                        absolute top-2 right-2
+                        p-1 rounded-lg
+                        text-gray-400 hover:text-gray-600
+                        transition-colors
+                    "
+                    aria-label="Fechar"
+                >
+                    <X className="h-4 w-4" />
+                </button>
 
-                    {/* Botão de ação */}
+                {/* Conteúdo */}
+                <div className="pr-6">
+                    <h3 className="font-bold text-lg text-gray-900 mb-2">
+                        Promoção Especial
+                    </h3>
+                    <p className="text-sm text-gray-700 mb-3">
+                        Abasteça 50€ ou mais e ganhe uma lavagem grátis!
+                    </p>
                     <Link
                         href="/promocoes"
                         onClick={handleDismiss}
                         className="
-                            flex items-center gap-2
-                            bg-gray-900 text-white
+                            inline-block
+                            bg-green-600 text-white
                             px-4 py-2 rounded-lg
                             font-semibold text-sm
-                            hover:bg-gray-800
+                            hover:bg-green-700
                             transition-colors
-                            whitespace-nowrap
                         "
                     >
                         Ver Promoção
-                        <ArrowRight className="h-4 w-4" />
                     </Link>
-
-                    {/* Botão fechar */}
-                    <button
-                        onClick={handleDismiss}
-                        className="
-                            p-1 rounded-lg
-                            hover:bg-yellow-300/50
-                            transition-colors
-                            flex-shrink-0
-                        "
-                        aria-label="Fechar banner"
-                    >
-                        <X className="h-5 w-5" />
-                    </button>
                 </div>
             </div>
         </div>
-        </>
     );
 }
 

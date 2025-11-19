@@ -2,29 +2,11 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState, useEffect } from "react";
 import MobileMenu from "./MobileMenu";
 
 export default function Header() {
     const pathname = usePathname();
     const isHome = pathname === "/";
-    const [bannerVisible, setBannerVisible] = useState(false);
-
-    // Verificar se o banner de promoção está visível
-    useEffect(() => {
-        if (typeof window === "undefined") return;
-
-        const checkBanner = () => {
-            const todayKey = `promocao-banner-${new Date().toDateString()}`;
-            const wasDismissed = localStorage.getItem(todayKey);
-            setBannerVisible(!wasDismissed);
-        };
-
-        checkBanner();
-        // Verificar novamente após 10 segundos (quando o banner desaparece)
-        const timer = setTimeout(() => setBannerVisible(false), 10000);
-        return () => clearTimeout(timer);
-    }, []);
 
     console.log("[Header] Componente montado.");
     console.log("[Header] Pathname atual:", pathname);
