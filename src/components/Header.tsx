@@ -16,9 +16,13 @@ export default function Header() {
         { href: "/combustiveis", label: "Combustíveis" },
         { href: "/produtos", label: "Produtos" },
         { href: "/transporte-domicilio", label: "Transporte Domicílio" },
-        { href: "/promocoes", label: "Promoções" },
+        { href: "/promocoes", label: "Promoções" }, // PROMOÇÕES - DEVE APARECER NO MENU
         { href: "/contactos", label: "Contactos" },
     ];
+    
+    // DEBUG: Verificar se Promoções está na lista
+    console.log("[Header] Total de links:", links.length);
+    console.log("[Header] Link Promoções existe?", links.some(l => l.href === "/promocoes"));
 
     console.log("[Header] Links definidos:", links);
 
@@ -36,10 +40,10 @@ export default function Header() {
                         : "sticky top-0 bg-white/90 backdrop-blur border-b border-gray-200",
                 ].join(" ")}
             >
-                <div className="flex items-center justify-end px-4 md:px-8 h-16">
+                <div className="flex items-center justify-end px-2 md:px-4 lg:px-8 h-16 overflow-visible">
                     <nav
                         className={[
-                            "hidden md:flex gap-3 md:gap-4 lg:gap-6 text-xs md:text-sm lg:text-base font-medium flex-shrink-0",
+                            "hidden md:flex gap-2 md:gap-3 lg:gap-4 xl:gap-6 text-xs md:text-sm lg:text-base font-medium flex-shrink-0 overflow-visible",
                             isHome ? "text-white drop-shadow" : "text-gray-800",
                         ].join(" ")}
                     >
