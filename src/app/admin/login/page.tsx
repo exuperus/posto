@@ -38,7 +38,13 @@ export default function AdminLoginPage() {
 
             setOk(true);
             console.log("[AdminLoginPage] Login bem-sucedido.");
-            router.push("/admin/precos");
+            
+            // Aguardar um momento para garantir que o cookie está definido
+            setTimeout(() => {
+                console.log("[AdminLoginPage] A redirecionar para /admin/precos...");
+                // Usar window.location para garantir que o cookie é enviado
+                window.location.href = "/admin/precos";
+            }, 100);
         } catch (err) {
             console.error("[AdminLoginPage] Erro no fetch:", err);
             setError("Falha de rede ou servidor.");
