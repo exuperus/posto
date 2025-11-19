@@ -1,12 +1,8 @@
 // Service Worker para PWA
-const CACHE_NAME = 'sandrina-mario-v1';
+// Atualizar a versão quando houver mudanças importantes para forçar atualização
+const CACHE_NAME = 'sandrina-mario-v2';
+// Apenas cachear assets estáticos, NÃO páginas HTML
 const urlsToCache = [
-  '/',
-  '/combustiveis',
-  '/produtos',
-  '/contactos',
-  '/servicos',
-  '/transporte-domicilio',
   '/icon-192.png',
   '/icon-512.png',
   '/manifest.json',
@@ -49,26 +45,72 @@ self.addEventListener('activate', (event) => {
   );
 });
 
-// Estratégia: Network First, com fallback para Cache
+// Estratégia: Network First para HTML, Cache First para assets estáticos
 self.addEventListener('fetch', (event) => {
+  const url = new URL(event.request.url);
+  const isHTML = event.request.headers.get('accept')?.includes('text/html');
+  const isStaticAsset = url.pathname.match(/\.(js|css|png|jpg|jpeg|gif|svg|ico|woff|woff2|ttf|eot)$/i);
+  
+  // Para páginas HTML: SEMPRE buscar da rede primeiro (nunca cachear HTML)
+  if (isHTML) {
+    event.respondWith(
+      fetch(event.request)
+        .then((response) => {
+          // Retorna sempre a versão mais recente da rede
+          return response;
+        })
+        .catch(() => {
+          // Se offline, tenta buscar do cache como último recurso
+          return caches.match(event.request)
+            .then((cachedResponse) => {
+              if (cachedResponse) {
+                return cachedResponse;
+              }
+              return new Response('Offline - Conteúdo não disponível', {
+                status: 503,
+                headers: { 'Content-Type': 'text/plain' }
+              });
+            });
+        })
+    );
+    return;
+  }
+  
+  // Para assets estáticos: Cache First (mais rápido)
+  if (isStaticAsset) {
+    event.respondWith(
+      caches.match(event.request)
+        .then((cachedResponse) => {
+          if (cachedResponse) {
+            return cachedResponse;
+          }
+          return fetch(event.request).then((response) => {
+            // Cachear apenas se for sucesso
+            if (response.status === 200) {
+              const responseClone = response.clone();
+              caches.open(CACHE_NAME).then((cache) => {
+                cache.put(event.request, responseClone);
+              });
+            }
+            return response;
+          });
+        })
+    );
+    return;
+  }
+  
+  // Para outros recursos: Network First
   event.respondWith(
     fetch(event.request)
       .then((response) => {
-        // Cache válido, retorna a resposta
-        const responseClone = response.clone();
-        caches.open(CACHE_NAME).then((cache) => {
-          cache.put(event.request, responseClone);
-        });
         return response;
       })
       .catch(() => {
-        // Se a rede falhar, busca no cache
         return caches.match(event.request)
           .then((cachedResponse) => {
             if (cachedResponse) {
               return cachedResponse;
             }
-            // Se não encontrar no cache, retorna erro genérico
             return new Response('Offline - Conteúdo não disponível', {
               status: 503,
               headers: { 'Content-Type': 'text/plain' }
