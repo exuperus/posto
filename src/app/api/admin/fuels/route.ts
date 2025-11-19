@@ -19,15 +19,27 @@ type FuelUpdatePayload = {
 
 // Função para verificar autenticação (simplificada)
 async function checkAuth(request: NextRequest): Promise<boolean> {
-    const adminKey = request.cookies.get("ak")?.value;
-    const expectedKey = process.env.ADMIN_KEY;
+    const adminKey = request.cookies.get("ak")?.value?.trim();
+    const expectedKey = process.env.ADMIN_KEY?.trim();
+    
+    console.log("[Admin Fuels] Verificando autenticação:", {
+        cookieExists: !!request.cookies.get("ak"),
+        adminKeyLength: adminKey?.length ?? 0,
+        expectedKeyLength: expectedKey?.length ?? 0,
+        keysMatch: adminKey === expectedKey
+    });
     
     if (!expectedKey) {
         console.warn("[Admin Fuels] ADMIN_KEY não definida no ambiente");
         return false;
     }
     
-    return adminKey === expectedKey;
+    if (!adminKey || adminKey !== expectedKey) {
+        console.warn("[Admin Fuels] Cookie inválido ou não corresponde à ADMIN_KEY");
+        return false;
+    }
+    
+    return true;
 }
 
 export async function PUT(request: NextRequest) {

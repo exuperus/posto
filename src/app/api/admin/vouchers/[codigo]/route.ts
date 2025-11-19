@@ -5,15 +5,27 @@ export const dynamic = "force-dynamic";
 
 // Função para verificar autenticação admin
 async function checkAuth(request: NextRequest): Promise<boolean> {
-  const adminKey = request.cookies.get("ak")?.value;
-  const expectedKey = process.env.ADMIN_KEY;
+  const adminKey = request.cookies.get("ak")?.value?.trim();
+  const expectedKey = process.env.ADMIN_KEY?.trim();
+
+  console.log("[Admin Vouchers] Verificando autenticação:", {
+    cookieExists: !!request.cookies.get("ak"),
+    adminKeyLength: adminKey?.length ?? 0,
+    expectedKeyLength: expectedKey?.length ?? 0,
+    keysMatch: adminKey === expectedKey
+  });
 
   if (!expectedKey) {
     console.warn("[Admin Vouchers] ADMIN_KEY não definida no ambiente");
     return false;
   }
 
-  return adminKey === expectedKey;
+  if (!adminKey || adminKey !== expectedKey) {
+    console.warn("[Admin Vouchers] Cookie inválido ou não corresponde à ADMIN_KEY");
+    return false;
+  }
+
+  return true;
 }
 
 // GET: Buscar informações do voucher
