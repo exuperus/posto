@@ -2,11 +2,29 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useState, useEffect } from "react";
 import MobileMenu from "./MobileMenu";
 
 export default function Header() {
     const pathname = usePathname();
     const isHome = pathname === "/";
+    const [bannerVisible, setBannerVisible] = useState(false);
+
+    // Verificar se o banner de promoção está visível
+    useEffect(() => {
+        if (typeof window === "undefined") return;
+
+        const checkBanner = () => {
+            const todayKey = `promocao-banner-${new Date().toDateString()}`;
+            const wasDismissed = localStorage.getItem(todayKey);
+            setBannerVisible(!wasDismissed);
+        };
+
+        checkBanner();
+        // Verificar novamente após 10 segundos (quando o banner desaparece)
+        const timer = setTimeout(() => setBannerVisible(false), 10000);
+        return () => clearTimeout(timer);
+    }, []);
 
     console.log("[Header] Componente montado.");
     console.log("[Header] Pathname atual:", pathname);
@@ -16,13 +34,9 @@ export default function Header() {
         { href: "/combustiveis", label: "Combustíveis" },
         { href: "/produtos", label: "Produtos" },
         { href: "/transporte-domicilio", label: "Transporte Domicílio" },
-        { href: "/promocoes", label: "Promoções" }, // PROMOÇÕES - DEVE APARECER NO MENU
+        { href: "/promocoes", label: "Promoções" },
         { href: "/contactos", label: "Contactos" },
     ];
-    
-    // DEBUG: Verificar se Promoções está na lista
-    console.log("[Header] Total de links:", links.length);
-    console.log("[Header] Link Promoções existe?", links.some(l => l.href === "/promocoes"));
 
     console.log("[Header] Links definidos:", links);
 
@@ -36,14 +50,18 @@ export default function Header() {
                 className={[
                     "z-40 w-full",
                     isHome
-                        ? "absolute top-0 left-0 right-0 bg-gradient-to-b from-black/45 to-transparent"
-                        : "sticky top-0 bg-white/90 backdrop-blur border-b border-gray-200",
+                        ? `absolute left-0 right-0 bg-gradient-to-b from-black/45 to-transparent transition-all duration-500 ${
+                            bannerVisible ? "top-[60px] md:top-[72px]" : "top-0"
+                          }`
+                        : `sticky bg-white/90 backdrop-blur border-b border-gray-200 transition-all duration-500 ${
+                            bannerVisible ? "top-[60px] md:top-[72px]" : "top-0"
+                          }`,
                 ].join(" ")}
             >
-                <div className="flex items-center justify-end px-2 md:px-4 lg:px-8 h-16 overflow-visible">
+                <div className="flex items-center justify-end px-8 h-16">
                     <nav
                         className={[
-                            "hidden md:flex gap-2 md:gap-3 lg:gap-4 xl:gap-6 text-xs md:text-sm lg:text-base font-medium flex-shrink-0 overflow-visible",
+                            "hidden md:flex gap-6 text-sm md:text-base font-medium",
                             isHome ? "text-white drop-shadow" : "text-gray-800",
                         ].join(" ")}
                     >
@@ -59,7 +77,7 @@ export default function Header() {
                                     console.log(`[Header] Clique no link: ${label} → ${href}`)
                                 }
                                 className={[
-                                    "relative transition-colors whitespace-nowrap flex-shrink-0",
+                                    "relative transition-colors",
                                     isHome
                                         ? active
                                             ? "text-lime-300"
