@@ -28,7 +28,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <html lang="pt-PT">
         <head>
             <link rel="manifest" href="/manifest.json" />
-            <link rel="apple-touch-icon" href="/icon-192.png" />
             <meta name="theme-color" content="#059669" />
             <script src="/register-sw.js" defer></script>
         </head>
